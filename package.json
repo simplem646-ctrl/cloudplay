@@ -1,0 +1,21 @@
+{
+  "name": "bellhaven-days",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Bellhaven Days - a Harvest-Moon-style school life sim. Three.js, frontend-only, localStorage saves.",
+  "scripts": {
+    "gen": "node scripts/gen-registry.mjs",
+    "build": "node scripts/build.mjs",
+    "build:dev": "node scripts/build.mjs --dev",
+    "test": "node scripts/gen-registry.mjs && node --test \"test/**/*.test.mjs\"",
+    "validate": "node scripts/validate-content.mjs",
+    "serve": "node scripts/serve.mjs dist 8080"
+  },
+  "dependencies": {
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.24.0"
+  }
+}
