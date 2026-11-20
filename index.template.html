@@ -3,18 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="claude:viewport-fit-sides" content="cover">
 <title><!--TITLE--></title>
 <style>
-  :root { --bg: #17121f; --fg: #f4ead5; --accent: #f2b84b; color-scheme: dark; }
-  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--fg); overflow: hidden; }
+  /* Deliberate single look: a dark, cozy pixel-game stage. Tokens first, then layout. */
+  :root { --bg: #17121f; --fg: #f4ead5; --accent: #f2b84b; --muted: #9a8fa8; color-scheme: dark; }
+  html, body { height: 100%; box-sizing: border-box; }
   body {
-    font-family: ui-monospace, Menlo, Consolas, monospace;
+    margin: 0; background: var(--bg); color: var(--fg); overflow: hidden;
+    font-family: ui-monospace, Menlo, Consolas, "Courier New", monospace;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
     -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
     touch-action: none; overscroll-behavior: none;
   }
-  #app { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+  /* The game stage: the engine scales its 320x240 canvas to fit this box (content box, so the gutters hold). */
+  #app { position: relative; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
   #app canvas { image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
-  #boot { position: absolute; font-size: 14px; opacity: .7; letter-spacing: .05em; }
+  #boot { position: absolute; font-size: 14px; color: var(--muted); letter-spacing: .05em; }
 </style>
 </head>
 <body>

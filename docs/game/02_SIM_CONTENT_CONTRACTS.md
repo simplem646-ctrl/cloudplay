@@ -220,3 +220,15 @@ with an in-memory fallback (storage can be unavailable). `migrate(save)` upgrade
 `sleep()` (skip to next morning), `skipDays(n)`, `runEvent(id)`, `listEvents()`,
 `state()` (deep copy), `loadState(json)`, `press(action, ms)` (input injection),
 `screenshot()` (data URL). Used by Playwright QA; keep it stable.
+
+## 13. Scene registry & directors (lead-owned: `src/scenes/registry.js`)
+
+Integration tasks never import each other: they register **scenes** by name and consult **directors** through
+`src/scenes/registry.js` (read its header: the full list of scene names, params and results is the contract).
+`await openScene(game, name, params)` pushes a scene and resolves with the value it passes to `game.scenes.pop(result)`
+(`SceneManager.push` returns that promise). A missing scene resolves `{ missing: true, score: 0, rank: 'none' }` so partially built games still run.
+The interpreter's `call` op maps through `openCall(game, 'minigame'|'activity'|'shop'|'exam', id, opts)`.
+A **director** (`registerDirector(name, fn, order)`) is a per-in-game-minute policy the overworld asks while idle:
+`fn(game, ctx) -> null | { scene, params }`. T8a registers the school-day director (starts `class` sessions when a period begins and the
+player is in `school_classroom`, runs exam days, remedial days, forced homeroom/late handling); T9a registers forced-sleep (02:00) and
+energy-collapse directors. The overworld pauses the clock while an opened scene runs.

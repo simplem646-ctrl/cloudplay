@@ -166,3 +166,43 @@ All endings are warm; "merged" is bittersweet, not a punishment (the bell and th
 - Staging uses anchors from `04_WORLD_SPEC.md` (`spot_a`–`spot_d`, `center`, `entrance`, map-specific). Start scenes with
   `fade out → place/warp → fade in`, end with the player free.
 - Never reference UI buttons or real-world brands. English only. No profanity beyond "darn/heck".
+
+## 10. Cross-writer conventions (so independent writers fit together)
+
+**Event ownership by prefix.** `main_`, `fest_` = S1 · `nina_`, `elise_` = S2 · `clara_`, `mari_`, `vera_` = S3 ·
+`jules_`, `dante_`, `owen_`, `bruno_`, `kit_`, `roz_`, `finch_`, `rand_`, `class_`, `staff_`, `town_` = S4a.
+Read `docs/game/api/story_main.md` (S1's table of main/festival event ids, flags, windows) before writing hooks.
+
+**Onboarding sequence, Year 1 Spring 1-12 (ids and triggers are fixed):**
+
+| When | Event id | Owner | Trigger |
+|---|---|---|---|
+| Sp1 06:30 | `main_01_wake_up` | S1 | `wake` (breakfast with Aunt Roz; points Theo toward school via the square) |
+| Sp1 07:00-08:15 | `nina_01_meet` | S2 | `enterMap town_square` (a runner with a bread basket collides with him) |
+| Sp1 08:20-09:15 | `fest_entrance_ceremony` | S1 | `enterMap school_grounds` (Principal Marsh's speech) |
+| Sp1 09:20-12:00 | `main_02_homeroom` | S1 | `enterMap school_classroom`, after the ceremony (Ms. Delaney introduces Theo; she says Clara is the class rep) |
+| Sp1 11:30-17:00 | `jules_01_guide` | S4a | `auto`, `when: seen main_02_homeroom` (lunch-break tour: cafeteria, library, rooftop stairs) |
+| Sp1-3 | `clara_01_meet` | S3 | `talk clara` (class rep gives him the timetable; first rivalry spark) |
+| Sp2-8 | `elise_01_meet` | S2 | `enterMap school_library` (the window-seat reader) |
+| Sp3-10 | `mari_01_meet` | S3 | `enterMap school_art_room` or `flower_shop` |
+| Sp4-12 | `vera_01_meet` | S3 | `enterMap school_rooftop` (and Biscuit the cat) |
+| Sp2-4 | `main_03_*` tutorial beats | S1 | `wake` (Aunt Roz: talking/gifts, classes, money/shops/job, clubs) |
+| Sp5 | `fest_club_fair` | S1 | club choice via flags `club_pick_<club>` (see below) |
+
+Every `_01_meet` must have a wide window and **never hard-lock**: it also fires on later days when its `when` window is still open.
+
+**Festival evening flags.** S1's `fest_<id>` events (Fireworks, Moon Night, Bell Festival, Lantern Night, Heart Day) ask who Theo spends
+the evening with and set `fest_<festivalId>_y<year>_with_<npcId>` (e.g. `fest_moon_night_y1_with_clara`) for people with >= 3 hearts.
+Heroine writers trigger their personal festival beat (`_04_festival`, `_08_climax`) with `trigger: { type: 'clock', at: '<HH:MM>', map: '<festival place>' }`
+and `when: { festival: '<id>', year: n, hearts: [...] }`; the **romantic version** requires the `..._with_<heroine>` flag, otherwise play a short **friend version**
+(a missed-moment scene) that still moves the story and never blocks later events.
+
+**Clubs.** The Club Fair sets `club_pick_<club>` flags; the integrator maps them to joining (`school.club`). Writers read the club with `{ club: 'track' }`.
+
+**Hearts as points.** `hearts: ['nina', '>=', 4]` means friendship >= 40. `friend` deltas are in points (10 = one heart): a good
+scene gives +3..+6, a great choice +8, a bad one -3.
+
+**Dating.** A confession event sets dating with `romance(npc, 'dating')`; conditions read `{ dating: 'nina' }` or `{ partner: 'nina' }`.
+Gate every dating-only scene with `dating`, and every non-dating variant with `{ not: { dating: id } }`.
+
+**Seen events.** Reference other writers' events only by the canonical ids listed in sections 4-5 and in `story_main.md`.
