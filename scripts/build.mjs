@@ -4,7 +4,7 @@
 //   node scripts/build.mjs --dev                   -> unminified, inline sourcemap
 //   node scripts/build.mjs --entry src/dev/x.js --out dist/dev/x.html
 //   node scripts/build.mjs --all-dev               -> every src/dev/*.js -> dist/dev/<name>.html
-//   node scripts/build.mjs --artifact              -> also writes dist/artifact.html: the same page as a
+//   node scripts/build.mjs --artifact              -> also writes <out>.artifact.html (dist/index.artifact.html): the same page as a
 //        fragment (no doctype/html/head/body tags) for publishing as a Claude Artifact, whose host wraps it
 // A single file works from file:// (host Playwright) and from any static server.
 
@@ -65,9 +65,9 @@ try {
     await one(val('--entry', 'src/main.js'), out, val('--title', 'Bellhaven Days'));
     if (flag('--artifact')) {
       const frag = toFragment(fs.readFileSync(path.join(root, out), 'utf8'));
-      const ap = path.join(root, 'dist/artifact.html');
-      fs.writeFileSync(ap, frag);
-      console.log(`[build] artifact fragment -> dist/artifact.html  ${(frag.length / 1024).toFixed(0)} KB`);
+      const rel = out.replace(/\.html$/, '.artifact.html');
+      fs.writeFileSync(path.join(root, rel), frag);
+      console.log(`[build] artifact fragment -> ${rel}  ${(frag.length / 1024).toFixed(0)} KB`);
     }
   }
 } catch (e) {

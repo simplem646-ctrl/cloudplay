@@ -1,0 +1,25 @@
+# Mini-games API (`src/scenes/activities/**`, built by the lead as part of T8b tier 1)
+
+Three full-screen mini-games, registered through the scene registry. T9a's boot must call `registerActivityScenes()` (from `src/scenes/activities/index.js`).
+
+| scene name | game | controls | result |
+|---|---|---|---|
+| `minigame:track_sprint` | 100 m dash: 4 lanes, 3 AI runners, false-start penalty | alternate LEFT/RIGHT (or Z/X) | `{score, rank, place, time}` |
+| `minigame:music_rhythm` | 4-lane falling-note rhythm game, seeded chart (~24 s) | arrow keys | `{score, rank, perfect, good, miss, maxCombo}` |
+| `minigame:cafe_serve` | serve customers (coffee/tea/cake/sandwich) before patience runs out (45 s) | arrows = items | `{score, rank, served, spawned, tips}` |
+
+All results also carry `minigame` (id), `context` (as passed) and `detail` (one-line text). `rank`: `gold >= 85, silver >= 65, bronze >= 40, none`.
+Open one with `await openScene(game, 'minigame:track_sprint', { context: 'club'|'festival'|'exam'|'job'|'date', difficulty: 0..1, seed?, fitness? })`
+(`fitness` defaults to `game.sim.state.player.traits.fitness`). Cancelling on the intro screen returns `{score:0, rank:'none', cancelled:true}`.
+
+Structure: `minigame.js` (base class: intro -> 3-2-1 countdown -> play -> result with medal -> `scenes.pop(result)`; subclasses implement `startPlay/playUpdate/playDraw/drawBackground`
+and call `this.end(score, extra)`), `logic.js` (pure and Node-tested: `rankFor`, sprint speed/scoring, seeded `makeChart`/`judgeHit`/`rhythmScore`, `makeOrders`/`cafeScore`),
+one file per game. Mini-games paint an OPAQUE full-screen background (the UI canvas is blended over the world layer). They use `game.audio.sfx` if present and
+`game.ui.services.drawIcon` for café item icons (placeholders otherwise). To add one: subclass `MiniGame`, add pure scoring to `logic.js` with tests, register it in `index.js`.
+
+Harness: `node scripts/build.mjs --entry src/dev/minigames_demo.js --out dist/dev/minigames_demo.html`, open `?game=track_sprint|music_rhythm|cafe_serve` (`&live=1` to play with the keyboard).
+It boots the REAL engine + UI service; `window.__mg` = `{ step(n), tap(action), start(), run(frames) /* scripted autoplayer */, scene(), result() }`.
+Tests: `test/scenes/minigames_logic.test.mjs`. Verified: all three play from intro to result through the engine (autoplayer: sprint 2nd place 12.68 s, rhythm 29/29 perfect, café 12/12 served).
+
+NOT built yet (still T8b): `soccer_penalty`, `art_palette`, `literature_words`, `astronomy_stars` (clubs without a mini-game need a fallback in `club_practice`), the `shop` scene,
+the activity scenes (`activity:rest/nap/jog/job_cafe/club_practice/...`), and the sim logic that applies results (`src/sim/{clubs,jobs,activities}.js`).
