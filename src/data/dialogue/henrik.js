@@ -1,0 +1,30 @@
+export default {
+  npc: 'henrik',
+  intro: [
+    { meet: 'henrik' },
+    { say: 'henrik', text: "Oh. Hello. Henrik Alder, carpenter. Sorry, I'm a bit tired. The kids, you know.", expr: 'neutral' },
+    { say: 'henrik', text: "That's Pip, the one running. And that's Lottie, the one directing. They're mine. Mostly.", expr: 'laugh' },
+    { say: 'henrik', text: "I can fix most things. If your cottage creaks, I'll know why. Tobias taught me everything about lamp-posts.", expr: 'happy' },
+  ],
+  talk: [
+    { id: 'hen_default_1', weight: 1, lines: ["Hmm? Oh, hello. I was thinking about wood. I do that a lot."] },
+    { id: 'hen_default_2', weight: 1, lines: ["Measure twice, cut once, and sleep when you can. That's my whole philosophy."] },
+    { id: 'hen_spring', weight: 2, when: { season: 'spring' }, lines: ['Spring means fences. Everyone remembers their fence in spring. Funny, that.'] },
+    { id: 'hen_summer', weight: 2, when: { season: 'summer' }, lines: ['Hot enough to warp a plank. I work in the shade and complain in the sun.'] },
+    { id: 'hen_autumn', weight: 2, when: { season: 'autumn' }, lines: ['Autumn, and the fair stalls need building. Every year I swear I will build them early. Every year, I do not.'] },
+    { id: 'hen_winter', weight: 2, when: { season: 'winter' }, lines: ['Winter nights are for whittling. Pip says I whittle a lot of pencils. I do.'] },
+    { id: 'hen_rain', weight: 3, when: { weather: ['rain', 'storm'] }, lines: ["Rain's fine for working. I just stand under the shed roof and hammer. It sounds like a drum."] },
+    { id: 'hen_saturday', weight: 3, when: { weekday: 'sat' }, lines: ["It's Saturday. I'm supposed to be off. The kids are at the park, and I am at the park. Close enough."] },
+    { id: 'hen_lanterns', weight: 3, when: { lanterns: { gte: 1 } }, lines: ['The lamps glow again. I had a hand in the old ones. Funny, how proud it makes you.'] },
+    { id: 'hen_friend', weight: 3, when: { hearts: { npc: 'henrik', gte: 3 } }, lines: ['The kids like you. That says a lot. They are tough critics.'] },
+  ],
+  gifts: {
+    love: ["Well. That's... thank you. I really needed that. Honest.", "You've no idea how much this helps. Thanks, {player}."],
+    like: ['Good. Thank you.', 'That is useful. I appreciate it.'],
+    neutral: ['Thanks. Appreciate it.', "That's kind. Thank you."],
+    dislike: ["Hm. Not really for me. But thank you for thinking of me.", "I'll find a place. Probably the attic."],
+    hate: ['That... no. Please take it away.', "I can't. I really can't. Sorry."],
+    birthday: ["You remembered. I'd forgotten myself. Thank you, {player}. Truly.", "A birthday gift? Well. That's... kind. Thank you."],
+    again: ["That's plenty, thanks. I'm... not used to this.", "You've been generous enough. Really."],
+  },
+};

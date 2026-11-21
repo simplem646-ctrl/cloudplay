@@ -1,0 +1,32 @@
+export default {
+  npc: 'rosalind',
+  intro: [
+    { meet: 'rosalind' },
+    { say: 'rosalind', text: "You're the new tenant. Good. I'm Rosalind. This is my bakery. Don't touch anything warm.", expr: 'neutral' },
+    { say: 'rosalind', text: 'My daughter Mira helps me. She is very enthusiastic. Sometimes the flour pays for it.', expr: 'happy' },
+    { say: 'rosalind', text: "If you want work, I need a helper from seven to eleven. Monday to Saturday. Be on time.", expr: 'neutral' },
+    { say: 'rosalind', text: "Tobias came every morning, you know. First loaf. He'd have liked you, I think.", expr: 'happy' },
+  ],
+  talk: [
+    { id: 'ros_default_1', weight: 1, lines: ['Good bread takes time. Most good things do. Do not rush the dough.', 'The oven is hot, the bread is warm and my patience is thin. Choose your words.'] },
+    { id: 'ros_default_2', weight: 1, lines: ['Mira says I am strict. I say I am consistent. We are both right.', "Flour on your sleeve already? You're a natural."] },
+    { id: 'ros_spring', weight: 2, when: { season: 'spring' }, lines: ['Spring means lighter loaves and a lot of new customers. Everyone wants bread, then forgets to say thank you.'] },
+    { id: 'ros_summer', weight: 2, when: { season: 'summer' }, lines: ['It is warm by the oven in summer. I do not complain. I just sweat quietly.'] },
+    { id: 'ros_autumn', weight: 2, when: { season: 'autumn' }, lines: ['Bake-off at the fair. I have won six times. This year, Mira wants to help. We shall see.'] },
+    { id: 'ros_winter', weight: 2, when: { season: 'winter' }, lines: ['Winter is the best bread season. Everybody wants warm things. Even grumps.'] },
+    { id: 'ros_rain', weight: 3, when: { weather: ['rain', 'storm'] }, lines: ['Rain makes people hungry. I have never understood why. I am glad of it.'] },
+    { id: 'ros_sunday', weight: 3, when: { weekday: 'sun' }, lines: ['Sunday, so the bakery is closed. I do not know what to do with my hands. They are not used to it.'] },
+    { id: 'ros_friend', weight: 3, when: { hearts: { npc: 'rosalind', gte: 3 } }, lines: ['You work hard, {player}. Here, take a roll. No, I am not giving you a discount. A roll.', 'My daughter likes you. I do not say that lightly. She likes everyone, but you she respects.'] },
+    { id: 'ros_tobias', weight: 3, when: { flag: 'journal_found' }, lines: ['He left a lantern on my step every dawn. I never told him how much that meant.'] },
+  ],
+  gifts: {
+    love: ["Oh... oh, that is lovely. Thank you, {player}. I'll make something special with this.", 'This is... too much. Thank you. Truly.'],
+    like: ['That will be useful. Thank you.', 'Good. Solid. I appreciate it.'],
+    neutral: ['Hm. Thank you.', 'That is kind of you.'],
+    dislike: ['Not quite for me. But I know you meant well.', 'Hm. Keep your gifts, my dear. Save them for someone else.'],
+    hate: ['Take that out of my bakery. Now.', 'In my kitchen? Over my dead body.'],
+    birthday: ["You remembered my birthday? Well. I'm... touched. Don't tell anyone I said that.", 'A birthday present. That is thoughtful, {player}. Thank you.'],
+    again: ["That's enough for one day, {player}. I'll spoil.", 'Please, no more. I am not used to being fussed over.'],
+  },
+  shop: { greet: ["Fresh from the oven. Don't dither.", 'What will it be? Hurry, the bread is hot.', 'Take what you need. Pay for what you take.'] },
+};

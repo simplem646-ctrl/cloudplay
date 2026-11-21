@@ -1,14 +1,31 @@
-/**
- * STUB — replaced by workstream 5 (Story & Content).
- * Empty collections with the exact keys of API_SURFACE.data.
- */
-const empty = () => ({});
+// Content data hub. Exposes Game.data (see ARCHITECTURE section 13).
+import npcs from './npcs.js';
+import { ITEM_MAP } from './items.js';
+import fish from './fish.js';
+import { FISH } from './fish.js';
+import forage from './forage.js';
+import shops from './shops.js';
+import jobs from './jobs.js';
+import buildings from './buildings.js';
+import schedules from './schedules.js';
+import quests from './quests.js';
+import events from './events/index.js';
+import festivals from './festivals.js';
+import calendar from './calendar.js';
+import mail from './mail.js';
+import books from './books.js';
+import interactions from './interactions.js';
+import dialogue from './dialogue/index.js';
+import tutorial from './tutorial.js';
+import errands from './errands.js';
+
+void FISH;
 
 export const Data = {
-  npcs: empty(), items: empty(), fish: empty(), forage: empty(), shops: empty(), jobs: empty(), buildings: empty(),
-  schedules: empty(), quests: empty(), events: empty(), festivals: empty(),
-  calendar: { festivals: [], weekly: [] },
-  mail: empty(), books: empty(), interactions: empty(), dialogue: empty(), tutorial: [], errands: [],
+  npcs, items: ITEM_MAP, fish, forage, shops, jobs, buildings, schedules, quests, events, festivals, calendar,
+  mail, books, interactions, dialogue, tutorial, errands,
   getItem(id) { return this.items[id] || null; },
   getNpc(id) { return this.npcs[id] || null; },
 };
+
+export default Data;

@@ -1,0 +1,32 @@
+export default {
+  npc: 'barnaby',
+  intro: [
+    { meet: 'barnaby' },
+    { say: 'barnaby', text: "Welcome, welcome, WELCOME to Pennywhistle Provisions! If we don't have it, you don't need it!", expr: 'happy' },
+    { say: 'barnaby', text: "Barnaby Pennywhistle, at your service. You've met my nephew Theo? He's the one running out of the door.", expr: 'laugh' },
+    { say: 'barnaby', text: "Rope, bread, lamp oil, cheese, a hundred things! And a post counter in the corner, for the letters!", expr: 'happy' },
+    { say: 'barnaby', text: "Why did the scarecrow get promoted? He was outstanding in his field! Ha ha! Oh, I'll be here all day.", expr: 'laugh' },
+  ],
+  talk: [
+    { id: 'bar_default_1', weight: 1, lines: ["Business is booming! Well, humming. Lightly. A pleasant hum!", "Anything I can get you? Rope? Cheese? A bad pun? All three?"] },
+    { id: 'bar_default_2', weight: 1, lines: ["I'm very good at counting. Pennies, buttons, nails. Never been lost for a number!", "Have you tried the cheese? It's sharp. Like me! Ha!"] },
+    { id: 'bar_spring', weight: 2, when: { season: 'spring' }, lines: ["Spring sale! Everything is exactly the same price! But in a cheerful mood!"] },
+    { id: 'bar_summer', weight: 2, when: { season: 'summer' }, lines: ["Lemonade's in! And I'm in a pun mood. Why don't eggs tell jokes? They'd crack each other up! Ha!"] },
+    { id: 'bar_autumn', weight: 2, when: { season: 'autumn' }, lines: ["Autumn, the time of harvest and heavy sacks! Buy a basket. You'll want a basket."] },
+    { id: 'bar_winter', weight: 2, when: { season: 'winter' }, lines: ["Lamp oil is on special! Not really. But it's winter, and you look like you need lamp oil!"] },
+    { id: 'bar_rain', weight: 3, when: { weather: ['rain', 'storm'] }, lines: ['Rain, rain, buy my umbrella! Look, I made a rhyme! A sales rhyme!'] },
+    { id: 'bar_wed', weight: 3, when: { weekday: 'wed' }, lines: ["Wednesdays I close. Do not ask me why. It is a secret. Okay, I count my pennies. Do not tell anyone."] },
+    { id: 'bar_friend', weight: 3, when: { hearts: { npc: 'barnaby', gte: 3 } }, lines: ["You're my favourite customer, {player}. Don't tell the others. Don't tell Theo. He thinks it's him."] },
+    { id: 'bar_evening', weight: 2, when: { time: { from: '18:00', to: '22:00' } }, lines: ['I eat at the inn after closing. Nana Fen never charges me for her opinions.'] },
+  ],
+  gifts: {
+    love: ["Well, shiver me shelves! This is marvellous, {player}! I'll put it right in the window!", "For me?! Ha! That's the best day-of-selling I've had all year, and I haven't sold a thing!"],
+    like: ['Ha! Lovely! I\'ll take it. Do I owe you? No? Even better!', 'How kind! This is a keeper, my friend.'],
+    neutral: ["A gift! You don't have to, but I'm glad you did!", 'Ha, thank you! I will find a shelf for it!'],
+    dislike: ["Hm. Er, it's... not exactly stock, you know. But thanks!", "I'll put it in the back, where I put the other mysteries."],
+    hate: ["Whoa! That's rubbish! Literally! Out it goes!", "That doesn't belong in a respectable store. Or any store. Or in the world."],
+    birthday: ["It's my birthday and you remembered! Ha! This is better than a sale! Slightly!", "A birthday present! Come in, come in, everything's on the house! Almost!"],
+    again: ["No more, no more! My shelves can't hold it!", "That's plenty! I'm making a loss in kindness!"],
+  },
+  shop: { greet: ["Welcome to Pennywhistle's! Every item has a story, and a price!", 'What can I do you for? And I mean that kindly.', 'Browse, browse! Touch everything! Buy something!'] },
+};

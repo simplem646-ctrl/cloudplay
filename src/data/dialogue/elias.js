@@ -1,0 +1,30 @@
+export default {
+  npc: 'elias',
+  intro: [
+    { meet: 'elias' },
+    { say: 'elias', text: 'Ah. A new face. Dr. Elias Whitlock. I run the clinic. Please do not catch anything on my account.', expr: 'neutral' },
+    { say: 'elias', text: 'You look well. A little tired, perhaps. Everyone in Lanternbrook looks a little tired. It is the hills.', expr: 'thinking' },
+    { say: 'elias', text: 'If you feel unwell, come by. If you feel fine, come by anyway. I have herbal tea. A great deal of it.', expr: 'happy' },
+  ],
+  talk: [
+    { id: 'eli_default_1', weight: 1, lines: ['Hello. Have you had water today? Good. Drink more.', 'I prescribe rest, tea and a long walk. I have been prescribing the same thing for twenty years.'] },
+    { id: 'eli_default_2', weight: 1, lines: ['Seven hours of sleep is not a luxury. It is medicine.', 'Mint tea, chamomile tea, ginger tea. I have an opinion on all of them. Please do not ask.'] },
+    { id: 'eli_spring', weight: 2, when: { season: 'spring' }, lines: ['Spring sniffles. Everyone gets them. Everyone ignores me. Everyone returns.'] },
+    { id: 'eli_summer', weight: 2, when: { season: 'summer' }, lines: ['Summer: sunburn, sunstroke and sand in the strangest places. Wear a hat.'] },
+    { id: 'eli_autumn', weight: 2, when: { season: 'autumn' }, lines: ['Autumn coughs are coming. Wrap up, drink tea, and please stop licking the fountain.'] },
+    { id: 'eli_winter', weight: 2, when: { season: 'winter' }, lines: ['Winter is when the clinic fills. Mostly with people who want a warm chair and a cup of tea. I allow it.'] },
+    { id: 'eli_rain', weight: 3, when: { weather: ['rain', 'storm'] }, lines: ['A wet day is a good day for rest. I recommend staying in. I recommend it, but nobody does.'] },
+    { id: 'eli_sunday', weight: 3, when: { weekday: 'sun' }, lines: ['The clinic is closed on Sundays. I am not really off duty. I merely walk slower.'] },
+    { id: 'eli_friend', weight: 3, when: { hearts: { npc: 'elias', gte: 3 } }, lines: ['You are one of the few patients who laugh at my jokes. I did not realise they were jokes.', 'I will say this: you look well, {player}. Do not let it go to your head.'] },
+  ],
+  gifts: {
+    love: ['Chamomile. Oh, thank you. This is exactly what the doctor ordered. I am the doctor.', "That is... truly kind. I will brew it right away."],
+    like: ['That is thoughtful. Thank you.', 'Ah, good. Useful. I am grateful.'],
+    neutral: ['Thank you. That was unnecessary but welcome.', 'I appreciate the thought, {player}.'],
+    dislike: ['Hm. I am afraid that is not great for my constitution. But thank you.', 'I will find a place for it. Not in my stomach.'],
+    hate: ['I must advise against that. In the strongest terms.', 'Please remove it. For health reasons, and for my sanity.'],
+    birthday: ['You remembered. How kind. I shall have a quiet cup of tea in your honour.', 'A birthday gift. Thank you, {player}. I do not receive many.'],
+    again: ['No more, thank you. Moderation, you see.', 'That is quite enough, {player}. I am already well-supplied.'],
+  },
+  shop: { greet: ['Please, take a seat. What do you need?', 'Tea is in the corner, medicine is on the shelf. Neither is for everyone.', 'Herbs and tonics, as the doctor orders.'] },
+};
