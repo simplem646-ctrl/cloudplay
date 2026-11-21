@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Lanternbrook Days</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+  body { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; font-family: Nunito, system-ui, sans-serif; }
+  #game-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; background: #000; outline: none; touch-action: none; }
+  #ui-root { position: fixed; inset: 0; overflow: hidden; touch-action: none; user-select: none; }
+</style>
+<!-- BUILD:IMPORTMAP:START -->
+<script type="importmap">
+{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }
+</script>
+<!-- BUILD:IMPORTMAP:END -->
+</head>
+<body>
+<canvas id="game-canvas" tabindex="0"></canvas>
+<div id="ui-root"></div>
+<!-- BUILD:SCRIPT:START -->
+<script type="module" src="/src/main.js"></script>
+<!-- BUILD:SCRIPT:END -->
+</body>
+</html>

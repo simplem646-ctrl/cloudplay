@@ -1,0 +1,41 @@
+<!doctype html>
+<!-- Lab template: copy to tools/labs/<name>.html. Served by `npm run serve`; open /tools/labs/<name>.html -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab template</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #111; overflow: hidden; color: #eee; font: 14px system-ui, sans-serif; }
+  #lab-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+  #lab-info { position: fixed; left: 8px; top: 8px; pointer-events: none; text-shadow: 0 1px 2px #000; }
+</style>
+<!-- Same import map as /index.html: labs import modules from /src/... -->
+<script type="importmap">
+{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<canvas id="lab-canvas"></canvas>
+<div id="lab-info">lab template</div>
+<script type="module">
+  import * as THREE from 'three';
+  // import { something } from '/src/world/something.js';
+  const params = new URLSearchParams(location.search);          // labs read their options from the query string
+  const canvas = document.getElementById('lab-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: false });
+  renderer.setPixelRatio(1);
+  renderer.setSize(innerWidth, innerHeight, false);
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x9fd8ff);
+  const camera = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 0.1, 200);
+  camera.position.set(0, 12, 10);
+  camera.lookAt(0, 0, 0);
+  const mesh = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), new THREE.MeshNormalMaterial());
+  scene.add(mesh);
+  document.getElementById('lab-info').textContent = `lab template (${params.get('q') || 'medium'})`;
+  renderer.render(scene, camera);
+  window.__ready = true;                                         // convention: set after the first rendered frame
+</script>
+</body>
+</html>

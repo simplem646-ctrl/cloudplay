@@ -1,0 +1,20 @@
+{
+  "name": "lanternbrook-days",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Lanternbrook Days - a cozy 3D life-sim (Three.js, single-file build).",
+  "scripts": {
+    "serve": "node tools/serve.mjs",
+    "build": "node tools/build.mjs",
+    "build:dev": "node tools/build.mjs --dev",
+    "test": "node --test \"tests/unit/*.test.mjs\" && node tools/check-contract.mjs && node tools/run-validators.mjs",
+    "contract": "node tools/check-contract.mjs"
+  },
+  "dependencies": {
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "esbuild": "0.28.2"
+  }
+}
