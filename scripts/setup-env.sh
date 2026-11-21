@@ -126,6 +126,8 @@ start_dockerd() {
   if docker info >/dev/null 2>&1; then return 0; fi
   if ! have dockerd; then log "dockerd not installed; skipping docker stacks"; return 1; fi
 
+  # A restored snapshot can carry a stale /var/run/docker.pid whose PID now names an unrelated thread; dockerd then refuses to start ("process with PID n is still running").
+  [ -f /var/run/docker.pid ] && ! grep -qx dockerd "/proc/$(cat /var/run/docker.pid 2>/dev/null)/comm" 2>/dev/null && rm -f /var/run/docker.pid
   log "starting dockerd"
   # setsid puts dockerd in its own session, so a signal to the hook's process
   # group (e.g. when the async hook times out) does not take the daemon down.
