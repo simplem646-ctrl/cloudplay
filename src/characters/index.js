@@ -1,22 +1,41 @@
 /**
- * STUB — replaced by workstream 2 (Characters & Portraits).
- * Returns inert objects with the full Rig / Critter shapes; no Three import.
+ * Characters module (WS2): procedural 3D chibi villagers + critters. See docs/game/ARCHITECTURE.md §6.
+ * Imports only three, three/addons and core/{registry,util}. Importable in Node (canvases are created lazily).
  */
-export function createCharacter(id) {
-  const rig = {
-    id, group: { isStub: true }, height: 1.15,
-    setFacing() {}, getFacing: () => 's', faceTowards() {}, locomote() {},
-    play: () => Promise.resolve(), stop() {}, setExpression() {}, emote() {}, setHeld() {},
-    setVisible() {}, setSeason() {}, update() {}, dispose() {},
-  };
-  return rig;
+import { createRig } from './rig.js';
+import { createCritter as makeCritter } from './critters.js';
+import { APPEARANCE_IDS } from './appearances.js';
+import { createFaceAtlas } from './face.js';
+import { buildParts } from './build.js';
+import { propGeometry } from './props.js';
+import { emoteTexture } from './emotes.js';
+import { gradientMap, toonMaterial, outlineMaterial } from './materials.js';
+import { EMOTES, HELD_PROPS } from '../core/registry.js';
+
+/** createCharacter(id, { season?, scale?, look? }) → Rig. id is 'player' or an NPC id. */
+export function createCharacter(id, opts = {}) {
+  if (!APPEARANCE_IDS.includes(id)) throw new Error(`createCharacter: unknown character "${id}"`);
+  return createRig(id, opts);
 }
-export function createCritter() {
-  return { group: { isStub: true }, update() {}, setBounds() {}, dispose() {} };
+
+/** createCritter(kind, { seed? }) → Critter */
+export function createCritter(kind, opts = {}) {
+  return makeCritter(kind, opts);
 }
+
+/** ['player', ...NPC ids] that have an appearance. */
 export function listAppearances() {
-  return [];
+  return APPEARANCE_IDS.slice();
 }
+
+/** Build shared geometry, materials, face atlases, emote textures (call once at load; safe in Node, a no-op for canvases). */
 export function preload() {
+  gradientMap(); toonMaterial(); outlineMaterial();
+  for (const id of APPEARANCE_IDS) {
+    const p = buildParts(id, 'spring', {});
+    createFaceAtlas(p.app, id);
+  }
+  for (const e of EMOTES) emoteTexture(e);
+  for (const p of HELD_PROPS) propGeometry(p);
   return Promise.resolve();
 }

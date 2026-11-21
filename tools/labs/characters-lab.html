@@ -1,0 +1,176 @@
+<!doctype html>
+<!-- Characters lab. Camera = the game's fixed camera (FOV 30, yaw 0, pitch 52deg) + warm key / hemisphere rig over a painted ground.
+  ?id=mira&anim=wave&expr=happy&season=spring&zoom=3&held=rod&emote=heart&t=0.6&facing=s&speed=0
+  ?lineup=1[&season=winter]      all 20 side by side
+  ?gallery=mira[&t=0.5]          one cell per animation, each sampled at t seconds (default: mid-way)
+  ?critters=1                    all critters wandering
+  &d=13.2 camera distance (13.2 ~ an interior view: character ~70 px tall at 720p; 20.6 ~ an exterior view)
+  &live=1 keeps animating; otherwise the first frame is rendered after stepping `t` seconds. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Characters lab</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #111; overflow: hidden; color: #fff; font: 11px system-ui, sans-serif; }
+  #lab-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+  #labels { position: fixed; inset: 0; pointer-events: none; }
+  #labels div { position: absolute; transform: translate(-50%, 0); text-shadow: 0 1px 2px #000, 0 0 3px #000; white-space: nowrap; font-size: 11px; }
+  #info { position: fixed; left: 8px; top: 6px; text-shadow: 0 1px 2px #000; pointer-events: none; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<canvas id="lab-canvas"></canvas>
+<div id="labels"></div>
+<div id="info"></div>
+<script type="module">
+  import * as THREE from 'three';
+  import { createCharacter, createCritter, listAppearances, preload } from '/src/characters/index.js';
+  import { ANIMATIONS, EXPRESSIONS, EMOTES, HELD_PROPS, CRITTERS } from '/src/core/registry.js';
+  import { IMPLEMENTED } from '/src/characters/anim.js';
+
+  const q = new URLSearchParams(location.search);
+  const num = (k, d) => (q.has(k) ? Number(q.get(k)) : d);
+  const canvas = document.getElementById('lab-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+  renderer.setPixelRatio(1);
+  renderer.setSize(innerWidth, innerHeight, false);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0xbfe3f5);
+
+  // ground: painted checker (1 tile cells)
+  const gc = document.createElement('canvas'); gc.width = gc.height = 256;
+  const g2 = gc.getContext('2d');
+  for (let y = 0; y < 8; y++) for (let x = 0; x < 8; x++) { g2.fillStyle = (x + y) % 2 ? '#93cf6e' : '#86c562'; g2.fillRect(x * 32, y * 32, 32, 32); }
+  const gt = new THREE.CanvasTexture(gc); gt.colorSpace = THREE.SRGBColorSpace; gt.wrapS = gt.wrapT = THREE.RepeatWrapping; gt.repeat.set(16, 16);
+  const ground = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.MeshLambertMaterial({ map: gt }));
+  ground.rotation.x = -Math.PI / 2;
+  scene.add(ground);
+  // light rig (warm key from front-right-up + sky/ground hemisphere)
+  scene.add(new THREE.HemisphereLight(0xdcefff, 0xb59a6a, 1.9));
+  const key = new THREE.DirectionalLight(0xfff0d2, 2.6);
+  key.position.set(4, 8, 6);
+  scene.add(key);
+
+  const camera = new THREE.PerspectiveCamera(30, innerWidth / innerHeight, 0.1, 200);
+  function frame(tx, tz, ty, dist) {
+    const pitch = num('pitch', 52) * Math.PI / 180;
+    camera.position.set(tx, ty + dist * Math.sin(pitch), tz + dist * Math.cos(pitch));
+    camera.lookAt(tx, ty, tz);
+  }
+
+  // blob shadow (the world normally provides this)
+  const sc = document.createElement('canvas'); sc.width = sc.height = 64;
+  const s2 = sc.getContext('2d'); const sg = s2.createRadialGradient(32, 32, 2, 32, 32, 30);
+  sg.addColorStop(0, 'rgba(30,20,10,0.38)'); sg.addColorStop(1, 'rgba(30,20,10,0)'); s2.fillStyle = sg; s2.fillRect(0, 0, 64, 64);
+  const shadowMat = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc), transparent: true, depthWrite: false });
+  function addShadow(group, r = 0.42) {
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(r * 2, r * 2), shadowMat);
+    m.rotation.x = -Math.PI / 2; m.position.y = 0.01; group.add(m);
+  }
+
+  const rigs = [];
+  const labels = document.getElementById('labels');
+  const info = document.getElementById('info');
+  const season = q.get('season') || 'spring';
+  const step = (rig, secs) => { for (let t = 0; t < secs; t += 1 / 30) rig.update(1 / 30); };
+  function spawn(id, x, z, extra = {}) {
+    const rig = createCharacter(id, { season, ...extra });
+    rig.group.position.set(x, 0, z);
+    addShadow(rig.group);
+    scene.add(rig.group);
+    rigs.push(rig);
+    return rig;
+  }
+  function label(text, x, z, dy = 0.15) { labels.insertAdjacentHTML('beforeend', `<div data-x="${x}" data-z="${z}" data-dy="${dy}">${text}</div>`); }
+
+  let dist = num('d', 13.2), target = [0, 0.55, 0];
+  let clock = null; // live critters/anim stepping
+  await preload();
+
+  if (q.has('lineup')) {
+    const ids = listAppearances();
+    ids.forEach((id, i) => {
+      const row = Math.floor(i / 10), col = i % 10;
+      const x = (col - 4.5) * 1.3, z = (row - 0.5) * 2.2;
+      const rig = spawn(id, x, z);
+      rig.setFacing('s', { snap: true });
+      if (q.has('anim')) rig.play(q.get('anim'));
+      step(rig, num('t', 0.6));
+      if (q.has('names')) label(id, x, z);
+    });
+    target = [0, 0.5, 0];
+    dist = num('d', 16);
+  } else if (q.has('gallery')) {
+    const id = q.get('gallery');
+    const names = ANIMATIONS.filter((n) => IMPLEMENTED.includes(n));
+    const cols = 9;
+    names.forEach((n, i) => {
+      const row = Math.floor(i / cols), col = i % cols;
+      const x = (col - (cols - 1) / 2) * 1.55, z = (row - 2) * 1.65;
+      const rig = spawn(id, x, z);
+      rig.setFacing('s', { snap: true });
+      step(rig, 0.4);
+      const p = rig.play(n, { loop: true });
+      const defDur = { idle: 1, walk: 1, run: 1 }[n];
+      step(rig, q.has('t') ? num('t', 0.5) : 0.55);
+      label(n, x, z + 0.55, 0);
+    });
+    target = [0, 0.4, 0.2];
+    dist = num('d', 16);
+  } else if (q.has('critters')) {
+    const kinds = CRITTERS;
+    kinds.forEach((k, i) => {
+      const c = createCritter(k, { seed: i + 1 });
+      const bx = (i % 4) * 4 - 6, bz = Math.floor(i / 4) * 4 - 3;
+      c.setBounds({ x: bx, z: bz, w: 3.4, h: 3.2 });
+      c.group.position.set(bx + 1.7, 0, bz + 1.6);
+      scene.add(c.group);
+      rigs.push({ update: (dt) => c.update(dt, { isBlockedAt: () => false, player: { x: bx + 1.7, z: bz + 6 } }), isCritter: true });
+      label(k, bx + 1.7, bz + 3.4, 0);
+      for (let t = 0; t < num('t', 2); t += 1 / 30) c.update(1 / 30, { isBlockedAt: () => false, player: { x: 99, z: 99 } });
+    });
+    target = [0, 0.3, 0.5];
+    dist = num('d', 18);
+  } else {
+    const id = q.get('id') || 'mira';
+    const zoom = num('zoom', 1);
+    const rig = spawn(id, 0, 0, q.has('hair') ? { look: { hair: '#' + q.get('hair'), jacket: '#' + (q.get('jacket') || '3b5b9c'), scarf: '#' + (q.get('scarf') || 'e8833a') } } : {});
+    rig.setFacing(q.get('facing') || 's', { snap: true });
+    if (q.has('expr')) rig.setExpression(q.get('expr'));
+    if (q.has('held')) rig.setHeld(q.get('held'));
+    if (q.has('speed')) rig.locomote(num('speed', 0));
+    step(rig, 0.3);
+    if (q.has('anim')) rig.play(q.get('anim'));
+    if (q.has('emote')) rig.emote(q.get('emote'));
+    step(rig, num('t', 0.6));
+    target = [0, rig.height * 0.5, 0];
+    dist = num('d', 13.2) / zoom;
+    window.__rig = rig;
+    info.textContent = `${id} anim=${q.get('anim') || 'idle'} expr=${q.get('expr') || 'neutral'} season=${season} meshes=${rig.stats.meshes} draw=${rig.stats.drawCalls} verts=${rig.stats.vertices}`;
+  }
+
+  function render() {
+    frame(target[0], target[2], target[1], dist);
+    renderer.render(scene, camera);
+    // position labels
+    for (const el of labels.children) {
+      const v = new THREE.Vector3(+el.dataset.x, +el.dataset.dy, +el.dataset.z).project(camera);
+      el.style.left = ((v.x * 0.5 + 0.5) * innerWidth) + 'px';
+      el.style.top = ((-v.y * 0.5 + 0.5) * innerHeight) + 'px';
+    }
+  }
+  render();
+  window.__ready = true;
+  if (q.has('live')) {
+    let last = performance.now();
+    const loop = (now) => { const dt = (now - last) / 1000; last = now; for (const r of rigs) r.update(dt); render(); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  }
+</script>
+</body>
+</html>
