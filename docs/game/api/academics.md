@@ -59,3 +59,19 @@ results) and `registerSchoolDirector()` (`registerDirector('school', fn, 20)`). 
 `class` · `exam` · `report_card` · `activity:study_home` · `activity:study_library` · `shop` · `activity:club_practice` · `activity:job_cafe` · `activity:rest` · `activity:nap` · `activity:jog`.
 Each scene: do the interaction, call the matching logic function, advance the clock by the returned `minutes` (if it passed `advanceClock:false`), then `game.scenes.pop(result)`
 with the shape in `src/scenes/registry.js`. Use `MockStage`-style fakes + `src/dev/*_demo.js` harnesses to screenshot them.
+
+## Scenes (built, `src/scenes/academics/`)
+`registerAcademicScenes()` (`index.js`) registers `class`, `exam`, `report_card`, `activity:study_home`, `activity:study_library`. Pure helpers (flavour lines, quiz pick, question/option layout,
+grade colours, teacher comments, hour options, time tint) live in `logic.js` (tests: `test/scenes/academics_logic.test.mjs`); backdrops in `backdrops.js`; shared base + result card in `common.js`.
+All scenes paint an opaque 320x240 backdrop, use `game.sim` (`state`, `clock.advance`, `balance`), `game.audio?.sfx` (tolerated if absent) and placeholder portraits when no art service exists.
+- `class` `{ period, subject, late, minutes, popQuiz, room }` -> `{ attended: true, gains, choice, minutes }`. Late grumble, a seeded teacher line (8 per subject, year-varied), attention ListMenu
+  (listen/notes/doze/pass_note), optional pop quiz (bank tier = year), `applyClass`, result card, `bell_school` sfx, `clock.advance(minutes)`. `room: 'school_field'` swaps in the field backdrop.
+- `exam` `{ examId, key, subject, slot, late, dayIndex, subjects }` -> `{ scores: { [subject]: score }, subject }`. `prepareSubject` at enter, struck options greyed (marked `x`), practical offered via
+  `minigame:<prep.practical>` (`missing`/`cancelled` -> `practical: null`, so art is skipped), `submitSubject`, result card with bonuses and a proctor line, clock +80 min. Does not loop to the second sitting.
+- `report_card` `{ examId, key }` -> `{}`. Parchment table (score, letter, bar), average, rank n/30, standing, running average, Ms. Delaney's comment (3 variants per standing, remedial notice),
+  banner + `cheer` for rank <= 3. `reportData(state, key)` is exported from `report_card.js`.
+- `activity:study_home` / `activity:study_library` `{ remedial?, hours?, subject? }` -> `{ minutes, gains: { [subject]: gain } }`. Subject list (knowledge bars, "book +n"), hours 1/2/3 (disabled when energy
+  cannot pay), animated desk/shelves with time-of-day tint, `study(..., { advanceClock: false })`, per-hour gains + energy, then `clock.advance(minutes)`. `remedial: true` skips the menus (1 h, given subject).
+  Too tired -> `{ minutes: 0, gains: {} }`. Cancelling the subject list also pops `{ minutes: 0, gains: {} }`.
+- Harness: `node scripts/build.mjs --entry src/dev/academics_demo.js --out dist/dev/academics_demo.html`, then `?scene=class|exam|report_card|study_home|study_library` (+ `&late=1&popquiz=1&room=school_field&subject=&year=&energy=&knowledge=&avg=&remedial=1&books=1&minute=`).
+  `window.__ac = { step(n), tap(action), scene(), result() }`.
