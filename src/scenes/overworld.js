@@ -504,8 +504,20 @@ export class OverworldScene extends Scene {
   // =============================================================================================
   // walking (Stage moveTo / debug walkTo)
   // =============================================================================================
+  /** Stop every scripted walk of `actor` (their promises resolve). Two walkers on one actor would drag it in opposite directions forever. */
+  cancelWalks(actor) {
+    for (const w of [...this.walkers]) {
+      if (w.actor !== actor) continue;
+      w.walker.cancel();
+      w.actor.speedMul = 1;
+      this.walkers.splice(this.walkers.indexOf(w), 1);
+      w.resolve();
+    }
+  }
+
   walkActor(actor, goal, { run = false } = {}) {
     const m = this.map;
+    this.cancelWalks(actor); // a newer walk supersedes an older one (e.g. `moveTo(..., { wait: false })` followed by another moveTo)
     const path = findPath(m.collision, m.width, m.height, actor.tx, actor.ty, goal.x, goal.y, { maxNodes: 8000 });
     if (!path || path.length < 2) {
       if (!path) actor.setTile(goal.x, goal.y);
@@ -628,7 +640,10 @@ export class OverworldScene extends Scene {
       const box = new ConfirmBox({ services: g.ui.services, message: early ? 'It is still early. Go to bed anyway?' : 'Go to bed and end the day?', yes: 'Sleep', no: 'Not yet' });
       if (!(await this.ask(box, { dim: true }))) return false;
     }
-    if (!forced) await this.runTrigger({ type: 'sleep' });
+    if (!forced) {
+      await this.runTrigger({ type: 'sleep' });
+      if (this.dead) return false; // a sleep-trigger event ended the game (Bell Night): the credits already took us back to the title
+    }
     this.hud.visible = false;
     g.audio && g.audio.sfx('sleep');
     await r.fade.out(quick ? 0 : 700);

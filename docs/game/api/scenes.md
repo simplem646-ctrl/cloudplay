@@ -35,9 +35,12 @@ re-arms `startDayTracking`, `applySettings`). Always read `game.sim` live; never
 - **Sleep** (`sleepFlow`): confirm -> `sleep` trigger -> fade -> `sim.clock.sleep()` -> `sleep` scene (`{summary}`) -> new morning on `home_theo:bed` -> `wake` trigger (autosave happens inside `clock.sleep`).
   `summary.gameEnd` -> `ending` scene. Forced (02:00): narration + Aunt Roz scolding. 0 energy: `clock.collapse()` -> clinic / nurse (home when that map is missing).
 - **Sub-scenes**: everything via `openScene` (registry). Missing ones toast "Coming soon". Actions implemented in `interactions.js` for all of `INTERACT_ACTIONS`
-  (`sleep save study shop text event activity job rest collect board calendar door_locked`; `board` lists `sim.calendar.upcoming`).
+  (`sleep save study shop text event activity job rest collect board calendar door_locked`; `board` lists `sim.calendar.upcoming`; the SCHOOL board first asks "Upcoming events / Club sign-ups": `clubSignup` in `interactions.js` joins, switches or leaves a club, the only sign-up path after the Club Fair).
 - **Talking** (`talkTo`): face the player, `relationships.talk`, birthday greeting, `talk` event else `dialogue.talk` lines (portrait + face), hearts toast, then "Give a gift?" (ChoiceBox -> ListMenu of non-key items
   -> `dialogue.gift` -> reaction lines + toast) when not gifted today.
+
+## Title (`title.js`)
+`Press Start` -> New Game / Continue / Options / How to Play (a controls sheet drawn in the scene: keyboard keys, touch note, two tips). Continue is preselected when a save exists.
 
 ## Stage (`stage.js`)
 Implements the whole Stage of doc 02 s7 over the overworld: `say narrate think choice warp place hide moveTo(A*) face pose emote cam fade flash lighting sfx music musicResume banner wait call endGame resolveAnchor`

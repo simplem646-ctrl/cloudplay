@@ -10,6 +10,7 @@
     "build:dev": "node scripts/build.mjs --dev",
     "test": "node scripts/gen-registry.mjs && node --test \"test/**/*.test.mjs\"",
     "validate": "node scripts/validate-content.mjs",
+    "audit": "node scripts/audit-reachability.mjs",
     "serve": "node scripts/serve.mjs dist 8080"
   },
   "dependencies": {

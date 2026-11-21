@@ -1,6 +1,8 @@
 // Interaction flows of the overworld: interactable actions (INTERACT_ACTIONS), talking, gifts, the notice board.
 // Every function takes the overworld scene (`ow`) and runs inside its busy guard (the caller wraps them).
-import { ListMenu, ChoiceBox } from '../ui/index.js';
+import { ListMenu, ChoiceBox, ConfirmBox } from '../ui/index.js';
+import { CLUBS, CLUB_LABEL } from '../core/constants.js';
+import { joinClub, leaveClub } from '../sim/clubs.js';
 import { openScene } from './registry.js';
 import { displayName, kindOf } from './npc_plan.js';
 import { CAST_BY_ID } from '../data/cast.js';
@@ -49,8 +51,38 @@ export async function runInteractable(ow, it) {
   await h(ow, it);
 }
 
-/** Notice board: upcoming festivals / exams / breaks (school) or festivals / birthdays (town). */
+/** Club sign-up sheet (school notice board): join, switch or leave a club. Switching resets the club rank and XP. */
+export async function clubSignup(ow) {
+  const state = ow.sim.state;
+  const services = ow.game.ui.services;
+  for (;;) {
+    const cur = state.school.club;
+    const items = CLUBS.map((c) => ({ label: CLUB_LABEL[c], value: c === cur ? 'joined' : '' }));
+    if (cur) items.push({ label: 'Leave my club', value: '' });
+    const menu = new ListMenu({ services, items, x: 24, y: 40, w: 272, rows: 8, title: 'Club Sign-ups', style: 'parchment', cancellable: true });
+    const res = await ow.ask(menu, { dim: true });
+    if (!res) return;
+    if (res.index >= CLUBS.length) {
+      const leave = await ow.ask(new ConfirmBox({ services, message: `Leave the ${CLUB_LABEL[cur]}? Your club rank resets.`, yes: 'Leave', no: 'Stay' }), { dim: true });
+      if (leave) { leaveClub(state); ow.toast('Left the club.', 'check'); }
+      continue;
+    }
+    const club = CLUBS[res.index];
+    if (club === cur) { await ow.showDialogue({ who: null, text: `You are already in the ${CLUB_LABEL[club]}. Practice is after school at the running track.`, style: 'narrate' }); continue; }
+    const message = cur ? `Switch from the ${CLUB_LABEL[cur]} to the ${CLUB_LABEL[club]}? Your club rank resets.` : `Join the ${CLUB_LABEL[club]}?`;
+    const yes = await ow.ask(new ConfirmBox({ services, message, yes: 'Join', no: 'Not now' }), { dim: true });
+    if (yes) joinClub(state, club, { bus: ow.game.bus });
+  }
+}
+
+/** Notice board: upcoming festivals / exams / breaks (school, plus the club sign-up sheet) or festivals / birthdays (town). */
 export async function noticeBoard(ow, id) {
+  if (id === 'school') {
+    const box = new ChoiceBox({ services: ow.game.ui.services, options: ['Upcoming events', 'Club sign-ups'], cancellable: true, title: 'School Notice Board', right: 200, bottom: 150 });
+    const pick = await ow.ask(box);
+    if (pick === undefined || pick === null || pick < 0) return;
+    if (pick === 1) { await clubSignup(ow); return; }
+  }
   const types = id === 'town' ? ['festival', 'birthday'] : ['festival', 'exam', 'results', 'break'];
   const rows = ow.sim.calendar.upcoming(8, { types });
   if (!rows.length) { await ow.showDialogue({ who: null, text: 'Nothing is posted right now.', style: 'narrate' }); return; }

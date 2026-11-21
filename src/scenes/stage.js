@@ -56,6 +56,7 @@ export class OverworldStage {
   }
   async place({ who, at, dir }) {
     const a = this.resolveAnchor(at);
+    this.ow.cancelWalks(this.peek(who) || { none: true }); // placing an actor ends any walk it was still doing
     if (who === 'theo' || who === 'player') {
       this.ow.player.setPose(null);
       this.ow.player.setTile(a.x, a.y);
@@ -68,6 +69,7 @@ export class OverworldStage {
     this.ow.npcs.place(who, t, dir || a.dir);
   }
   async hide(who) {
+    this.ow.cancelWalks(this.peek(who) || { none: true });
     if (who === 'theo' || who === 'player') { this.ow.player.visible = false; return; }
     this.ow.npcs.despawn(who);
   }

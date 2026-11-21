@@ -46,8 +46,8 @@ results) and `registerSchoolDirector()` (`registerDirector('school', fn, 20)`). 
 | `school.remedialDays > 0`, 15:10-16:30 on school grounds, once a day | `{ scene:'activity:study_library', params:{ remedial:true, hours:1, subject: weakest } }` (decrements the counter when issued) |
 
 ## Clubs / job / activities — `src/sim/{clubs,jobs,activities}.js`
-- Clubs: `joinClub(state, club, opts)`, `leaveClub`, `clubGame(club)` (mini-game id; `soccer_penalty`, `art_palette`, `literature_words`, `astronomy_stars` are NOT built:
-  the scene needs a fallback), `canPractice(state)` (club, 15:30-17:30 on school days / 09:00-17:30 otherwise, energy >= 20, once a day),
+- Clubs: `joinClub(state, club, opts)`, `leaveClub`, `clubGame(club)` (mini-game id; `soccer_penalty`, `art_palette`, `literature_words` are NOT built:
+  the scene uses its built-in timing drill; `astronomy_stars` exists since `ring_timing.js`), `canPractice(state)` (club, 15:30-17:30 on school days / 09:00-17:30 otherwise, energy >= 20, once a day),
   `practice(state, { score, rank })` -> `{ ok, club, xp, xpTotal, rank, rankUp, traits, energy, minutes: 120 }` (XP gold 12/silver 8/bronze 5/none 3 + practice items; rank 0-5 at XP 0/20/50/90/140/200;
   trains fitness / creativity / charm / science per club).
 - Job: `canWork(state)` (weekdays 16:00-19:00, free days 10:00-17:00; a shift may start 30 min before opening until close-3h; once a day; energy >= 25),

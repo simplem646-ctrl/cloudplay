@@ -17,6 +17,27 @@ Separately, the repo ships an optional pair of [session handoff
 hooks](#session-handoffs-optional). They make every commit Claude creates carry a
 short handoff doc, so work picks up cleanly after an autocompact.
 
+## Bellhaven Days, the game built in this repo
+
+`src/` holds **Bellhaven Days**: a cozy, Harvest-Moon-style school-life sim. You are Theo Hartley, a transfer
+student living above his aunt's café in the seaside town of Bellhaven. Over three school years (4 seasons x 28 days)
+you go to class, sit exams, join a club, work a café shift, make friends, can fall for one of five classmates, and help
+save the school and ring its long-silent bell. Three.js renders a 320x240 pixel-art picture; the game is frontend-only,
+saves to `localStorage`, and every sprite, tune and line is original and generated in code.
+
+| | |
+| --- | --- |
+| Play | `npm run build && npm run serve`, then open <http://localhost:8080> (or open `dist/index.html`). Also published as a Claude Artifact. |
+| Keys | Arrows / WASD move, Z / Enter / Space talk and confirm, X / Backspace cancel, Shift run, Tab / M / Esc menu, hold C to skip a story scene. Touch screens get an on-screen pad. |
+| Check | `npm test` (unit tests), `npm run validate` (content), `npm run audit` (dead-content scan), `npm run build:dev` + `node scripts/shot.mjs dist/index.html --script <flow.mjs>` (browser flows; the `window.__game.debug` API is in `docs/game/api/scenes.md`). |
+| Docs | Start at `docs/game/00_OVERVIEW.md`; the newest state is the latest file in `docs/handoffs/`. |
+
+Built: 15 of the 26 planned maps, 121 events (45 romance, 13 festivals, 33 story), 50 dialogue pools, 5 romance routes,
+35 ending slides, 3 mini-games plus a ring-timing game, 26 music tracks. Not built: 11 maps (beach, flower shop, bookstore,
+corner mart, clinic, cafeteria, art, music and gym rooms, observatory; their doors read "locked"), three club mini-games (soccer,
+art and literature practice use a plain timing drill), and four planned beats of every romance route (crisis, date, climax,
+farewell). The sound was checked by offline signal analysis only, never by ear.
+
 ## What you get
 
 | Piece | Where it runs | Reached at |

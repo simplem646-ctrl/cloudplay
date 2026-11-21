@@ -1,7 +1,7 @@
 // Title screen: season backdrop (art), drifting clouds, birds and seasonal particles, the logo, "Press Start" (the first gesture
 // unlocks audio), then New Game / Continue / Options. Continue loads the newest save (auto-save included).
 import { Scene } from '../engine/index.js';
-import { drawText, drawWindow, drawCursor, THEME } from '../ui/index.js';
+import { drawText, drawWindow, drawCursor, wrapText, THEME } from '../ui/index.js';
 import * as saveModule from '../sim/save.js';
 import { createNewGame } from '../sim/state.js';
 import { openScene } from './registry.js';
@@ -10,7 +10,22 @@ import { applySettings } from './menus/index.js';
 import { OverworldScene } from './overworld.js';
 
 const SEASONS = ['spring', 'summer', 'autumn', 'winter'];
-const MENU = ['New Game', 'Continue', 'Options'];
+const MENU = ['New Game', 'Continue', 'Options', 'How to Play'];
+
+// Controls sheet for the "How to Play" panel: [label, keys, what it does]. Colour markup: {y} gold, {k} grey.
+const HELP_ROWS = [
+  ['Move', 'Arrows / WASD', ''],
+  ['OK', 'Z / Enter / Space', 'talk, open'],
+  ['Back', 'X / Backspace', 'cancel'],
+  ['Run', 'Hold Shift', ''],
+  ['Menu', 'Tab / M / Esc', 'status, save'],
+  ['Skip', 'Hold C', 'story scenes'],
+];
+const HELP_TIPS = [
+  'Walk up to people and things, then press OK.',
+  'Sleeping in your bed ends the day and saves.',
+  'Touch: on-screen pad, A, B, RUN and MENU.',
+];
 
 /** Newest readable save slot: { slot, summary, savedAt } or null. */
 export function newestSave() {
@@ -93,6 +108,10 @@ export class TitleScene extends Scene {
       if (input.pressed('confirm') || input.pressed('menu') || g.titleGesture) { g.titleGesture = false; this.phase = 'menu'; g.audio && g.audio.sfx('confirm'); }
       return;
     }
+    if (this.phase === 'help') {
+      if (input.pressed('confirm') || input.pressed('cancel') || input.pressed('menu')) { this.phase = 'menu'; g.audio && g.audio.sfx('cancel'); }
+      return;
+    }
     if (input.repeat('up')) { this.cursor = (this.cursor + MENU.length - 1) % MENU.length; g.audio && g.audio.sfx('cursor'); }
     if (input.repeat('down')) { this.cursor = (this.cursor + 1) % MENU.length; g.audio && g.audio.sfx('cursor'); }
     if (input.pressed('confirm')) this.choose(this.cursor);
@@ -102,6 +121,7 @@ export class TitleScene extends Scene {
     const g = this.game;
     if (i === 1 && !this.save) { g.audio && g.audio.sfx('error'); this.say('No saved game yet.'); return; }
     g.audio && g.audio.sfx('confirm');
+    if (i === 3) { this.phase = 'help'; return; }
     this.busy = true;
     try {
       if (i === 0) {
@@ -150,10 +170,26 @@ export class TitleScene extends Scene {
     this.game.art.drawLogo(ctx, 72, 20 + bob);
     if (this.phase === 'press') {
       if (Math.floor(this.t * 1.6) % 2 === 0) drawText(ctx, 'Press Start', 160, 168, { color: THEME.cream, shadow: THEME.navyDeep, align: 'center', scale: 2 });
+    } else if (this.phase === 'help') {
+      drawWindow(ctx, 16, 24, 288, 190, 'menu');
+      drawText(ctx, 'HOW TO PLAY', 160, 34, { color: THEME.gold, shadow: THEME.navyDeep, align: 'center', scale: 2 });
+      let y = 60;
+      for (const [label, keys, note] of HELP_ROWS) {
+        drawText(ctx, label, 30, y, { color: THEME.gold, shadow: THEME.navyDeep });
+        drawText(ctx, keys, 72, y, { color: '#ffffff', shadow: THEME.navyDeep });
+        if (note) drawText(ctx, note, 180, y, { color: '#9a9fb5', shadow: THEME.navyDeep });
+        y += 14;
+      }
+      y += 8;
+      for (const tip of HELP_TIPS) {
+        for (const line of wrapText(tip, 256)) { drawText(ctx, line, 30, y, { color: THEME.cream, shadow: THEME.navyDeep }); y += 10; }
+        y += 3;
+      }
+      if (Math.floor(this.t * 1.6) % 2 === 0) drawText(ctx, 'Press OK to go back', 160, 198, { color: '#9a9fb5', shadow: THEME.navyDeep, align: 'center' });
     } else {
-      drawWindow(ctx, 104, 138, 112, 58, 'menu');
+      drawWindow(ctx, 104, 130, 112, 68, 'menu');
       MENU.forEach((label, i) => {
-        const y = 147 + i * 16;
+        const y = 138 + i * 15;
         const dis = i === 1 && !this.save;
         const sel = this.cursor === i;
         if (sel) { ctx.fillStyle = 'rgba(242,184,75,0.25)'; ctx.fillRect(110, y - 3, 100, 13); drawCursor(ctx, 113, y - 1, this.t); }
@@ -161,7 +197,7 @@ export class TitleScene extends Scene {
       });
       if (this.save && this.save.summary) {
         const s = this.save.summary;
-        drawText(ctx, `${s.timeLabel ? '' : ''}${String(s.season || '').replace(/^./, (c) => c.toUpperCase())} ${s.day}, Year ${s.year}  ${s.location || ''}`, 160, 202, { color: THEME.cream, shadow: THEME.navyDeep, align: 'center' });
+        drawText(ctx, `${s.timeLabel ? '' : ''}${String(s.season || '').replace(/^./, (c) => c.toUpperCase())} ${s.day}, Year ${s.year}  ${s.location || ''}`, 160, 204, { color: THEME.cream, shadow: THEME.navyDeep, align: 'center' });
       }
     }
     if (this.msgT > 0) drawText(ctx, this.msg, 160, 218, { color: '#ffb0a0', shadow: THEME.navyDeep, align: 'center' });

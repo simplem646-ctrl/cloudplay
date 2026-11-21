@@ -21,8 +21,9 @@ Harness: `node scripts/build.mjs --entry src/dev/minigames_demo.js --out dist/de
 It boots the REAL engine + UI service; `window.__mg` = `{ step(n), tap(action), start(), run(frames) /* scripted autoplayer */, scene(), result() }`.
 Tests: `test/scenes/minigames_logic.test.mjs`. Verified: all three play from intro to result through the engine (autoplayer: sprint 2nd place 12.68 s, rhythm 29/29 perfect, café 12/12 served).
 
-NOT built yet (still T8b): `soccer_penalty`, `art_palette`, `literature_words`, `astronomy_stars` (clubs without a mini-game need a fallback in `club_practice`), the `shop` scene,
-the activity scenes (`activity:rest/nap/jog/job_cafe/club_practice/...`), and the sim logic that applies results (`src/sim/{clubs,jobs,activities}.js`).
+Added later by the lead: `ring_timing.js` (`minigame:astronomy_stars` "Star Gazing" for Moon Viewing Night and the Astronomy Club, `activity:shell_hunt` "Shell Hunt" for Beach Day, which pays 1/2/3 Spiral Shells by medal):
+eight targets, a ring closes on each, confirm as it meets the target; pure helpers `ringProgress/ringAccuracy/ringScore/makeTargets`, tests in `test/scenes/ring_timing.test.mjs`.
+Still NOT built: `soccer_penalty`, `art_palette`, `literature_words` (those clubs use the built-in timing drill of `activity:club_practice`).
 
 ## Activity scenes (`src/scenes/activities/{shop,activity_club,activity_job,activity_rest}.js`)
 `registerActivityScenes()` now also registers `shop`, `activity:club_practice`, `activity:job_cafe`, `activity:rest`, `activity:nap`, `activity:jog`. All paint an opaque 320x240 backdrop,
