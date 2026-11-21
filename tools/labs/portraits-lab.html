@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Portraits Lab</title>
+<style>
+  :root { --bg: #e9dcc2; --ink: #4a3426; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 13px/1.3 system-ui, sans-serif; }
+  header { padding: 8px 12px; display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; }
+  h1 { font-size: 16px; margin: 0; }
+  #sheet { display: grid; grid-template-columns: 90px repeat(10, 150px); gap: 2px 4px; padding: 0 12px 8px; }
+  #sheet .lbl { font-weight: 600; align-self: center; }
+  #sheet .col { text-align: center; font-weight: 600; }
+  #sheet canvas { width: 150px; height: 187.5px; background: linear-gradient(#f6ecd8, #e2cfae); border-radius: 6px; }
+  #thumbs { display: flex; gap: 6px; padding: 4px 12px 12px; flex-wrap: wrap; }
+  #thumbs canvas { width: 96px; height: 120px; background: #6b8fb8; border-radius: 4px; }
+  #thumbs canvas:nth-child(2n) { background: #3a3046; }
+  #single { padding: 12px; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+  #single canvas { background: linear-gradient(#cfe3f3, #f4e7cf); border-radius: 8px; }
+  a { color: inherit; }
+</style>
+</head>
+<body>
+<header><h1>Portraits Lab</h1><span id="info">rendering…</span></header>
+<div id="root"></div>
+<script type="module">
+import { PORTRAIT_IDS, EXPRESSIONS, getPortrait, drawPortrait, preload, hasPortrait, renderStats, clearCache } from '../../src/portraits/index.js';
+
+const q = new URLSearchParams(location.search);
+const root = document.getElementById('root');
+const info = document.getElementById('info');
+const nextFrame = () => new Promise((r) => requestAnimationFrame(() => r()));
+
+async function single() {
+  const id = q.get('id') || 'mira';
+  const expr = q.get('expr') || 'neutral';
+  const scale = parseFloat(q.get('scale') || '1');
+  const exprs = expr === 'all' ? EXPRESSIONS : [expr];
+  const wrap = document.createElement('div'); wrap.id = 'single'; root.appendChild(wrap);
+  const opts = { season: q.get('season') || undefined, outline: q.get('outline') !== '0' };
+  const ids = id === 'all' ? PORTRAIT_IDS : [id];
+  for (const pid of ids) for (const e of exprs) {
+    const c = document.createElement('canvas');
+    c.width = 512 * scale; c.height = 640 * scale;
+    const src = getPortrait(pid, e, opts);
+    c.getContext('2d').drawImage(src, 0, 0, c.width, c.height);
+    wrap.appendChild(c);
+  }
+  info.textContent = `${id} · ${expr} · scale ${scale}`;
+}
+
+async function sheet() {
+  // warm-up (JIT, gradients, scratch canvases), then measure fresh renders
+  const w0 = performance.now(); getPortrait('mira', 'neutral', { outline: false }).getContext('2d').getImageData(0, 0, 1, 1); const warm = performance.now() - w0;
+  // "flushed" timing: render + force rasterisation (1px read-back) for every portrait
+  clearCache();
+  let fSum = 0, fMax = 0;
+  for (const id of PORTRAIT_IDS) for (const e of EXPRESSIONS) {
+    const t0 = performance.now();
+    getPortrait(id, e).getContext('2d').getImageData(0, 0, 1, 1);
+    const dt = performance.now() - t0; fSum += dt; fMax = Math.max(fMax, dt);
+  }
+  clearCache();
+  renderStats.count = 0; renderStats.totalMs = 0; renderStats.maxMs = 0;
+  // preload in idle slices while watching frame gaps
+  let maxGap = 0, last = performance.now(), running = true;
+  (function tick() { const t = performance.now(); maxGap = Math.max(maxGap, t - last); last = t; if (running) requestAnimationFrame(tick); })();
+  const p0 = performance.now();
+  const n = await preload();
+  const preloadMs = performance.now() - p0;
+  running = false;
+  const s0 = performance.now(); getPortrait('gus', 'laugh'); const second = performance.now() - s0;
+
+  const grid = document.createElement('div'); grid.id = 'sheet'; root.appendChild(grid);
+  grid.appendChild(document.createElement('div'));
+  for (const e of EXPRESSIONS) { const d = document.createElement('div'); d.className = 'col'; d.textContent = e; grid.appendChild(d); }
+  for (const id of PORTRAIT_IDS) {
+    const l = document.createElement('div'); l.className = 'lbl'; l.innerHTML = `<a href="?id=${id}&expr=all&scale=0.5">${id}</a>`; grid.appendChild(l);
+    for (const e of EXPRESSIONS) {
+      const c = document.createElement('canvas'); c.width = 300; c.height = 375;
+      drawPortrait(c.getContext('2d'), id, e, 0, 0, 300, 375);
+      grid.appendChild(c);
+    }
+  }
+  const th = document.createElement('div'); th.id = 'thumbs'; root.appendChild(th);
+  for (const id of PORTRAIT_IDS) for (const e of ['neutral', 'happy']) {
+    const c = document.createElement('canvas'); c.width = 96; c.height = 120;
+    drawPortrait(c.getContext('2d'), id, e, 0, 0, 96, 120);
+    th.appendChild(c);
+  }
+  const stats = {
+    rendered: n, warmupMs: +warm.toFixed(1),
+    flushedAvgMs: +(fSum / 90).toFixed(1), flushedMaxMs: +fMax.toFixed(1),
+    avgMs: +(renderStats.totalMs / renderStats.count).toFixed(1), maxMs: +renderStats.maxMs.toFixed(1),
+    preloadTotalMs: +preloadMs.toFixed(0), slices: renderStats.slices, maxSliceMs: +renderStats.maxSliceMs.toFixed(1), maxFrameGapMs: +maxGap.toFixed(1), cachedSecondCallMs: +second.toFixed(3),
+    hasPortrait: { mira: hasPortrait('mira'), rosalind: hasPortrait('rosalind') },
+  };
+  window.__info = stats;
+  info.textContent = JSON.stringify(stats);
+}
+
+(async () => {
+  try {
+    if (q.get('id')) await single(); else await sheet();
+  } catch (e) {
+    console.error(e);
+    info.textContent = 'ERROR: ' + e.message;
+  }
+  await nextFrame();
+  window.__ready = true;
+})();
+</script>
+</body>
+</html>
