@@ -196,7 +196,7 @@ const simple = {
   ],
   nurse_hale: [alwaysAt('school_day', 'school_hall_1f:nurse_desk', '08:00', '16:00', { schoolDay: true })],
   roz: [
-    { id: 'every_day', priority: 5, points: [['06:00', 'cafe_lantern:counter'], ['11:30', 'cafe_lantern:kitchen'], ['13:00', 'cafe_lantern:counter'], ['20:00', 'home_theo:kitchen_table'], ['22:30', null]] },
+    { id: 'every_day', priority: 5, points: [['06:00', 'cafe_lantern:counter'], ['11:30', 'cafe_lantern:npc_2'], ['13:00', 'cafe_lantern:counter'], ['20:00', 'home_theo:kitchen_table'], ['22:30', null]] },
   ],
   mr_finch: [
     { id: 'dry', priority: 5, when: DRY, points: [['08:30', 'town_harbor:finch_spot'], ['17:30', 'town_harbor:dock_bench'], ['19:30', null]] },

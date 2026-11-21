@@ -48,7 +48,7 @@ export class ReportCardScene extends AcademicScene {
     const ctx = ui.ctx, d = this.data;
     ctx.fillStyle = '#5a3d26'; ctx.fillRect(0, 0, 320, 240);
     drawWindow(ctx, 6, 3, 308, 234, 'parchment');
-    drawText(ctx, 'BELLHAVEN ACADEMY  -  REPORT CARD', 160, 9, { color: '#8a3a1a', shadow: null, align: 'center' });
+    drawText(ctx, 'BELLHAVEN HIGH  -  REPORT CARD', 160, 9, { color: '#8a3a1a', shadow: null, align: 'center' });
     drawText(ctx, `Student: Theo Hartley    ${this.label}`, 160, 20, { color: THEME.ink, shadow: null, align: 'center' });
     const rows = SUBJECTS.map((s) => {
       const sc = d.scores[s] ?? 0, g = letterGrade(sc);
