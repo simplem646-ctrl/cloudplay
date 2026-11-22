@@ -7,8 +7,14 @@ import { AREAS, areaAnchorNames, areaInteractables, lampIds } from '../../core/r
 import brook_lane from './brook_lane.js';
 import cottage from './cottage.js';
 import town_square from './town_square.js';
+import market_street from './market_street.js';
+import bakery from './bakery.js';
+import general_store from './general_store.js';
+import cafe from './cafe.js';
+import riverside_park from './riverside_park.js';
+import harbor from './harbor.js';
 
-export const BUILT = { brook_lane, cottage, town_square };
+export const BUILT = { brook_lane, cottage, town_square, market_street, bakery, general_store, cafe, riverside_park, harbor };
 
 function placeholder(id) {
   const reg = AREAS[id];

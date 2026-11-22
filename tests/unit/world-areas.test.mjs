@@ -12,7 +12,10 @@ test('world module exposes the contract API', () => {
 
 test('every registry area resolves to a def (built or placeholder)', () => {
   for (const id of AREA_IDS) assert.ok(getDef(id), id);
-  assert.deepEqual(builtAreaIds().sort(), ['brook_lane', 'cottage', 'town_square']);
+  // The three benchmark areas must always be built; further areas are added by later workers (superset check).
+  const built = builtAreaIds();
+  for (const id of ['brook_lane', 'cottage', 'town_square']) assert.ok(built.includes(id), `${id} is built`);
+  for (const id of built) assert.ok(AREA_IDS.includes(id), `${id} is a registry area`);
 });
 
 for (const id of ['brook_lane', 'cottage', 'town_square']) {
