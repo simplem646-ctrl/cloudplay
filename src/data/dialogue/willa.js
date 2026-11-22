@@ -78,7 +78,7 @@ export default {
     ] },
     { id: 'willa_dating_7', weight: 3, when: { flag: 'willa_dating' }, lines: [
       ['I saved you the seat by the nook. I even put a cushion on it. Do not tell the cushion I said so.', 'happy'],
-      ['Today is rainy. Perfect. We may breathe moderately.', 'laugh'],
+      ['Today is for reading. Perfect. We may breathe moderately.', 'laugh'],
     ] },
   ],
   gifts: {

@@ -2,7 +2,7 @@ import { heartEvent as H, events } from './_heart.js';
 
 export default events([
   H('juno', 2, {
-    area: 'harbor', at: 'pier_start', npcAt: 'pier_end', when: [{ time: { from: '07:00', to: '12:00' } }, { not: { weather: ['rain', 'storm'] } }, { item: { id: 'fishing_rod', gte: 1 } }],
+    area: 'harbor', at: 'pier_start', npcAt: { x: 25.4, z: 16.1 }, when: [{ time: { from: '07:00', to: '12:00' } }, { not: { weather: ['rain', 'storm'] } }, { item: { id: 'fishing_rod', gte: 1 } }],
     music: 'harbor',
     steps: [
       ['juno', 'Finally! A rod in your hand! Okay: five minutes, biggest fish wins. Loser carries the bucket.', 'smug'],
@@ -18,7 +18,7 @@ export default events([
     ],
   }),
   H('juno', 4, {
-    area: 'harbor', at: 'hut_steps', npcAt: 'boat_dock', when: [{ weather: ['storm', 'rain'] }, { time: { from: '08:00', to: '18:00' } }],
+    area: 'harbor', at: 'hut_steps', npcAt: { x: 37, z: 15.4 }, when: [{ weather: ['storm', 'rain'] }, { time: { from: '08:00', to: '18:00' } }],
     music: 'harbor',
     steps: [
       ['juno', 'There you are! The wind is rising, boats are loose! Grab the rope, {player}, and pull!', 'worried'],

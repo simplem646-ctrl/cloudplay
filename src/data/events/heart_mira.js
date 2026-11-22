@@ -37,7 +37,7 @@ export default events([
     ],
   }),
   H('mira', 6, {
-    area: 'riverside_park', at: 'bench_rp_1_spot', npcAt: 'gazebo_spot', when: [{ time: { from: '17:30', to: '20:00' } }, { not: { weather: ['rain', 'storm'] } }],
+    area: 'riverside_park', at: 'bench_rp_1_spot', npcAt: { x: 15.6, z: 10.2 }, when: [{ time: { from: '17:30', to: '20:00' } }, { not: { weather: ['rain', 'storm'] } }],
     steps: [
       ['mira', 'Oh! {player}! I did not hear you. I was writing in my notebook. It is just recipes. And some dreams.', 'shy'],
       ['mira', 'See? "Mira\'s Bakery." And a drawing of a window. It is a very bad drawing.', 'laugh'],

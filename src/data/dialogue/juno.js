@@ -67,7 +67,7 @@ export default {
       ['Lighthouse is humming tonight. You can hear it from the pier if you stand still. I stood still. For almost a minute!', 'happy'],
     ] },
     { id: 'juno_storm_6', weight: 3, when: { weather: 'storm' }, lines: [
-      ['Storm night. Everything is tied twice. That is the rule since you showed me how to listen.', 'smug'],
+      ['Storm out there. Everything is tied twice. That is the rule since you showed me how to listen.', 'smug'],
       ['I hate how right you were about the knot. I hate it a lot. Come inside, I will make tea.', 'shy'],
     ] },
     { id: 'juno_dating_7', weight: 3, when: { flag: 'juno_dating' }, lines: [
