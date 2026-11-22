@@ -19,13 +19,18 @@ export const LABELS = {
 /** Object types that stay usable when a person stands in front of them: offered as an extra choice in that person's menu. */
 const ALSO = new Set(['shop', 'job', 'lamp']);
 const counterLabel = (type) => (type === 'job' ? 'Work' : type === 'shop' ? 'Shop' : LABELS[type] || 'Use');
-export const promptFor = (type) => `Space: ${LABELS[type] || 'Use'}`;
+/** The confirm button as the player knows it: touch and gamepad show "A", keyboard shows "Space". */
+const confirmKey = () => (/^(touch|gamepad)$/.test(Game.input?.device || '') ? 'A' : 'Space');
+const labelOf = (verb) => `${confirmKey()}: ${verb}`;
+export const promptFor = (type) => labelOf(LABELS[type] || 'Use');
 
 const s = subs();
 let target = null; // {kind:'npc'|'object', id, label, it?}
 let busy = false;
 let cool = 0;
 let wasField = false;
+let offDevice = null;
+let lastLabel = null; // prompt text currently shown
 
 function pick(ent, a, area) {
   const f = FRONT[a.facing] || FRONT.s;
@@ -44,7 +49,7 @@ function pick(ent, a, area) {
     const score = d - 10; // a person in front always wins over props that share the spot (anchors sit on interaction points)
     if (score < bestD) {
       bestD = score;
-      best = { kind: 'npc', id: o.id, label: `Space: Talk`, actor: o };
+      best = { kind: 'npc', id: o.id, label: labelOf('Talk'), verb: 'Talk', actor: o };
     }
   }
   let counter = null; // nearest usable object, offered in the NPC menu when a person stands in front of it (Theo at the post counter, a villager by a lamp)
@@ -54,11 +59,11 @@ function pick(ent, a, area) {
     if (d > (it.r || 1) + 0.5) continue;
     if (ALSO.has(it.type) && d < counterD) {
       counterD = d;
-      counter = { kind: 'object', id: it.id, label: promptFor(it.type), it };
+      counter = { kind: 'object', id: it.id, label: promptFor(it.type), verb: LABELS[it.type] || 'Use', it };
     }
     if (d < bestD) {
       bestD = d;
-      best = { kind: 'object', id: it.id, label: promptFor(it.type), it };
+      best = { kind: 'object', id: it.id, label: promptFor(it.type), verb: LABELS[it.type] || 'Use', it };
     }
   }
   if (best && best.kind === 'npc' && counter) best.counter = counter;
@@ -69,9 +74,11 @@ function setTarget(t) {
   const same = (!t && !target) || (t && target && t.id === target.id && t.kind === target.kind);
   if (same) {
     target = t; // keep the fresh pick (its `counter` may have changed) without re-emitting
+    if (t && Game.ui?.setPrompt && t.label !== lastLabel) { lastLabel = t.label; Game.ui.setPrompt(t.label); }
     return;
   }
   target = t;
+  lastLabel = t ? t.label : null;
   Game.ui?.setPrompt?.(t ? t.label : null);
   Game.world?.setHighlight?.(t && t.kind === 'object' ? t.id : null);
   Game.bus.emit(EVT.INTERACT_TARGET, t ? { kind: t.kind, id: t.id, label: t.label } : null);
@@ -120,6 +127,13 @@ export const interaction = {
     busy = false;
     cool = 0;
     wasField = false;
+    offDevice?.();
+    // the prompt chip follows the last-used device while it is on screen
+    offDevice = Game.input?.onDevice?.(() => {
+      if (!target?.verb) return;
+      target.label = lastLabel = labelOf(target.verb);
+      Game.ui?.setPrompt?.(target.label);
+    }) || null;
   },
   get target() {
     return target;

@@ -235,7 +235,7 @@ test('shops: hours, closed days, lockFlag, festival closes, wrap past midnight',
   assert.equal(S.isOpen('town_square'), true); // no building entry
   setDate('spring', 7, 8 * 60); // Sun
   assert.equal(S.closedInfo('bakery').reason, 'day');
-  assert.equal(S.closedText('bakery'), 'The bakery is closed.');
+  assert.equal(S.closedText('bakery'), 'The bakery is closed. Open 7:00 AM – 5:00 PM, closed Sundays.');
   setDate('spring', 3, 10 * 60); // Wed
   assert.equal(S.isOpen('general_store'), false);
   assert.equal(S.closedInfo('workshop').reason, 'locked');
@@ -244,10 +244,13 @@ test('shops: hours, closed days, lockFlag, festival closes, wrap past midnight',
   assert.equal(S.isOpen('workshop'), true);
   setDate('spring', 1, 15 * 60);
   assert.equal(S.isOpen('observatory'), false);
+  // hours past midnight print as clock times; locked / festival reasons carry no hours line
+  assert.equal(S.closedText('observatory'), 'Closed. Open 4:00 PM – 3:00 AM.');
   assert.equal(S.isOpen('observatory', 16 * 60), true);
   assert.equal(S.isOpen('observatory', 25 * 60), true);
   setDate('spring', 14, 10 * 60); // festival Sun? (day 14 = Sun) -> use festival closes
   assert.equal(S.closedInfo('bakery').reason, 'festival');
+  assert.equal(S.closedText('bakery'), 'The bakery is closed.');
 });
 
 test('shops: stock filters by season, price override, null price skipped, limits', () => {
@@ -545,4 +548,83 @@ test('script: runQueued waits for the running script', async () => {
   await Promise.all([a, slow, q]);
   assert.deepEqual(order.slice(-2), ['slow', 'queued']);
   delete svc.script.ops.slow;
+});
+
+// ---------- bulk hand-in for give-quests ----------
+const bulkQuest = () => {
+  Game.data.quests.q_glass = { id: 'q_glass', kind: 'side', giver: 'gus', title: 'Glass', desc: 'd', stages: [{ id: 'g', text: 'Give 3 eels', goal: { type: 'give', npc: 'gus', item: 'eel', qty: 3 } }], reward: { flags: ['glass_done'] } };
+  return svc.quests.start('q_glass');
+};
+const slotOfItem = (id) => Game.state.inventory.slots.findIndex((s) => s?.id === id);
+
+test('gift: bulk hand-in delivers the whole quest stack as ONE gift (one event, one affection, giftDay set)', async () => {
+  setup();
+  bulkQuest();
+  svc.inventory.add('eel', 3, { silent: true });
+  const gifts = record('npc:gift');
+  Game.ui.answers.pickItem.push(slotOfItem('eel'));
+  Game.ui.answers.ask.push(0); // Hand over all
+  const r = await svc.rel.giftFlow('gus');
+  await svc.quests.idle();
+  assert.equal(r.qty, 3);
+  assert.equal(svc.inventory.count('eel'), 0);
+  assert.equal(gifts.length, 1);
+  assert.equal(gifts[0].qty, 3);
+  assert.equal(Game.state.log.gifts.gus.eel, 3);
+  assert.equal(Game.state.rel.gus.giftsThisWeek, 1);
+  assert.equal(svc.rel.aff('gus'), 45); // one 'like' gift, not three
+  assert.equal(svc.quests.isDone('q_glass'), true);
+  assert.deepEqual(Game.ui.of('ask')[0].options.map((o) => o.text), ['Hand over all 3 for the quest', 'Just one, as a gift', 'Never mind']);
+});
+
+test('gift: "just one" keeps the single-item path; cancel keeps everything', async () => {
+  setup();
+  bulkQuest();
+  svc.inventory.add('eel', 3, { silent: true });
+  Game.ui.answers.pickItem.push(slotOfItem('eel'));
+  Game.ui.answers.ask.push(1);
+  await svc.rel.giftFlow('gus');
+  await svc.quests.idle();
+  assert.equal(svc.inventory.count('eel'), 2);
+  assert.equal(svc.quests.isActive('q_glass'), true);
+  svc.clock.rollDay();
+  Game.ui.answers.pickItem.push(slotOfItem('eel'));
+  Game.ui.answers.ask.push(2); // never mind
+  assert.equal(await svc.rel.giftFlow('gus'), null);
+  assert.equal(svc.inventory.count('eel'), 2);
+});
+
+test('gift: no bulk question when only one is wanted or held', async () => {
+  setup();
+  bulkQuest();
+  svc.inventory.add('eel', 1, { silent: true });
+  Game.ui.answers.pickItem.push(slotOfItem('eel'));
+  await svc.rel.giftFlow('gus');
+  assert.equal(Game.ui.of('ask').length, 0);
+  assert.equal(svc.inventory.count('eel'), 0);
+});
+
+test('gift: after today\'s gift, quest items can still be delivered (no affection, daily gift untouched)', async () => {
+  setup();
+  bulkQuest();
+  svc.inventory.add('rose', 1, { silent: true });
+  Game.ui.answers.pickItem.push(slotOfItem('rose'));
+  await svc.rel.giftFlow('gus');
+  const aff = svc.rel.aff('gus');
+  const week = Game.state.rel.gus.giftsThisWeek;
+  svc.inventory.add('eel', 3, { silent: true });
+  Game.ui.answers.pickItem.push(slotOfItem('eel'));
+  Game.ui.answers.ask.push(0);
+  const r = await svc.rel.giftFlow('gus');
+  await svc.quests.idle();
+  assert.equal(r.delivery, true);
+  const f = Game.ui.of('pickItem').at(-1).filter;
+  assert.equal(f({ id: 'rose' }), false);
+  assert.equal(f({ id: 'eel' }), true);
+  assert.equal(svc.rel.aff('gus'), aff);
+  assert.equal(Game.state.rel.gus.giftsThisWeek, week);
+  assert.equal(svc.quests.isDone('q_glass'), true);
+  // with nothing wanted left: polite refusal again
+  svc.inventory.add('rose', 1, { silent: true });
+  assert.equal(await svc.rel.giftFlow('gus'), null);
 });

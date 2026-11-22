@@ -65,6 +65,17 @@ export const quests = {
     return D().quests?.[id] || a?.def || null;
   },
   isActive: (id) => !!Game.state?.quests.active[id],
+  /** Items an NPC still wants for the current `give` stage of an active quest: { itemId: remaining }. */
+  giveNeeds(npc) {
+    const out = {};
+    for (const [id, r] of Object.entries(Game.state?.quests.active || {})) {
+      const g = quests.def(id)?.stages?.[r.stage]?.goal;
+      if (g?.type !== 'give' || g.npc !== npc) continue;
+      const left = (g.qty ?? 1) - (r.progress?.n || 0);
+      if (left > 0) out[g.item] = (out[g.item] || 0) + left;
+    }
+    return out;
+  },
   isDone: (id) => Game.state?.quests.done[id] !== undefined,
   stageOf: (id) => (Game.state?.quests.active[id] ? Game.state.quests.active[id].stage : -1),
   stageId(id) {

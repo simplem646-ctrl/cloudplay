@@ -15,6 +15,22 @@ function soldRec(shopId) {
   return r;
 }
 
+const DAY_NAMES = { mon: 'Mondays', tue: 'Tuesdays', wed: 'Wednesdays', thu: 'Thursdays', fri: 'Fridays', sat: 'Saturdays', sun: 'Sundays' };
+/** Plain opening-hours sentence for a building, e.g. "Open 7:00 AM – 5:00 PM, closed Sundays." Always-open buildings skip the hours. */
+function hoursLine(b) {
+  const parts = [];
+  if (b.open !== undefined && b.close !== undefined) {
+    const o = parseHHMM(b.open);
+    let c = parseHHMM(b.close);
+    if (c <= o) c += 1440;
+    if (c - o < 1440) parts.push(`Open ${formatClock12(o)} – ${formatClock12(c)}`);
+  }
+  const days = (b.closedDays || []).map((d) => DAY_NAMES[d]).filter(Boolean);
+  if (days.length) parts.push(`${parts.length ? 'closed' : 'Closed'} ${days.length > 1 ? `${days.slice(0, -1).join(', ')} and ${days.at(-1)}` : days[0]}`);
+  return parts.length ? `${parts.join(', ')}.` : '';
+}
+const withHours = (text, b) => [text, hoursLine(b)].filter(Boolean).join(' ');
+
 export const shops = {
   get current() {
     return current;
@@ -28,9 +44,9 @@ export const shops = {
     if (b.lockFlag && !getFlag(b.lockFlag)) return { reason: 'locked', text: b.lockedText || b.closedText || 'It is locked.' };
     const fest = svc.events?.festivalToday?.();
     if (fest?.closes?.includes(area)) return { reason: 'festival', text: b.closedText || 'Closed for the festival today.' };
-    if (b.closedDays?.includes(curWeekday())) return { reason: 'day', text: b.closedText || 'Closed today.' };
+    if (b.closedDays?.includes(curWeekday())) return { reason: 'day', text: withHours(b.closedText || 'Closed today.', b) };
     if (b.open !== undefined && b.close !== undefined && !timeInRange(m, b.open, b.close)) {
-      return { reason: 'hours', text: b.closedText || `Closed. Open ${formatClock12(parseHHMM(b.open))} – ${formatClock12(parseHHMM(b.close))}.` };
+      return { reason: 'hours', text: withHours(b.closedText || 'Closed.', b) };
     }
     return null;
   },

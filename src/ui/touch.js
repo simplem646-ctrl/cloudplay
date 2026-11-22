@@ -15,7 +15,12 @@ function wantVisible() {
   return on && Game.mode === 'field' && !!Game.state;
 }
 
-export function refreshTouch() { if (el) el.classList.toggle('on', wantVisible()); }
+export function refreshTouch() {
+  if (!el) return;
+  const on = wantVisible();
+  el.classList.toggle('on', on);
+  if (on && !Game.input?.device) Game.input?.setDevice?.('touch'); // on-screen A button visible: prompts read "A: ..." until a key is pressed
+}
 
 export function buildTouch(root) {
   destroyTouch();
@@ -31,19 +36,19 @@ export function buildTouch(root) {
     knob.style.transform = `translate(${dx * 55}%, ${dy * 55}%)`;
     Game.input.setVirtualAxis(Math.abs(dx) < 0.12 ? 0 : dx, Math.abs(dy) < 0.12 ? 0 : dy);
   };
-  base.addEventListener('pointerdown', (e) => { unlockAudio(); pid = e.pointerId; base.setPointerCapture(pid); move(e); e.preventDefault(); });
+  base.addEventListener('pointerdown', (e) => { unlockAudio(); Game.input.setDevice('touch'); pid = e.pointerId; base.setPointerCapture(pid); move(e); e.preventDefault(); });
   base.addEventListener('pointermove', (e) => { if (e.pointerId === pid) move(e); });
   const release = (e) => { if (e.pointerId !== pid) return; pid = null; knob.style.transform = ''; Game.input.setVirtualAxis(0, 0); };
   base.addEventListener('pointerup', release);
   base.addEventListener('pointercancel', release);
   const hold = (label, action, cls) => {
     const b = h('button', { class: 'lb-tbtn ' + cls, testid: 'touch-' + action }, label);
-    b.addEventListener('pointerdown', (e) => { unlockAudio(); b.setPointerCapture(e.pointerId); Game.input.setVirtual(action, true); b.classList.add('down'); e.preventDefault(); });
+    b.addEventListener('pointerdown', (e) => { unlockAudio(); Game.input.setDevice('touch'); b.setPointerCapture(e.pointerId); Game.input.setVirtual(action, true); b.classList.add('down'); e.preventDefault(); });
     const up = () => { Game.input.setVirtual(action, false); b.classList.remove('down'); };
     b.addEventListener('pointerup', up); b.addEventListener('pointercancel', up);
     return b;
   };
-  const menu = h('button', { class: 'lb-tbtn menu', testid: 'touch-menu', onPointerdown: (e) => { e.preventDefault(); unlockAudio(); Game.input.setVirtual('menu', true); Game.input.setVirtual('menu', false); } }, '☰');
+  const menu = h('button', { class: 'lb-tbtn menu', testid: 'touch-menu', onPointerdown: (e) => { e.preventDefault(); unlockAudio(); Game.input.setDevice('touch'); Game.input.setVirtual('menu', true); Game.input.setVirtual('menu', false); } }, '☰');
   el = h('div', { class: 'lb-touch', testid: 'touch' }, base, h('div', { class: 'lb-tbtns' }, hold('Run', 'run', 'run'), hold('B', 'cancel', 'b'), hold('A', 'confirm', 'a')), menu);
   root.appendChild(el);
   offs = [Game.bus.on(EVT.MODE_CHANGE, refreshTouch), Game.bus.on(EVT.UI_SETTING, refreshTouch), Game.bus.on(EVT.GAME_NEW, refreshTouch), Game.bus.on(EVT.GAME_LOADED, refreshTouch)];

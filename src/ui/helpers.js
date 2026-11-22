@@ -50,7 +50,7 @@ const asList = (x) => (Array.isArray(x) ? x : x && typeof x === 'object' ? Objec
 export function birthdaysIn(season, npcs) {
   const sn = SEASONS[season];
   return asList(npcs).filter((n) => n && n.birthday && n.birthday.season === sn)
-    .map((n) => ({ day: n.birthday.day, npc: n.id, name: n.name || n.id })).sort((a, b) => a.day - b.day);
+    .map((n) => ({ day: n.birthday.day, npc: n.id, name: n.name || n.id, short: n.short || n.name || n.id })).sort((a, b) => a.day - b.day);
 }
 
 /** Festivals in a season: [{ day, id, name }] sorted by day. */

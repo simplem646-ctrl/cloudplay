@@ -76,7 +76,7 @@ Your journal (**J**) always shows what to do next. The **Map** (**M**) shows whe
 - Closeness is shown as **hearts** (0 to 10) in the **People** tab.
 - **Gifts:** choose "Give a gift" when you talk to someone and pick an item from your pack. You can give one gift per person per
   day, and a lot of gifts in one week will have less effect. Everybody has favourites, things they like, and things they would
-  rather not receive. Their birthdays (see the **Calendar** tab) make a good gift count for much more.
+  rather not receive. When someone asks for several of an item for a quest, you can hand over everything they need at once (it counts as that day's gift). Their birthdays (see the **Calendar** tab) make a good gift count for much more.
 - At certain heart levels, special scenes with a villager may take place. Five villagers can become more than friends.
   Only one partner at a time; the choice is entirely yours.
 

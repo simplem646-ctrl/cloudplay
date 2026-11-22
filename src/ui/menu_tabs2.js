@@ -157,9 +157,9 @@ export function calendarTab() {
         h('span', { class: 'lb-cal-icons' }, fm[cell.day] ? h('span', { class: 'lb-cal-ic', html: STAR_SVG }) : null, bm[cell.day] ? h('span', { class: 'lb-cal-ic', html: CAKE_SVG }) : null)));
     }
     const wk = ((Game.data && Game.data.calendar && Game.data.calendar.weekly) || []);
-    for (const f of fests) legend.appendChild(h('div', { class: 'lb-leg' }, h('span', { class: 'lb-cal-ic', html: STAR_SVG }), h('b', null, `${cap(sn)} ${f.day}`), ` ${f.name}`));
-    for (const b of bdays) legend.appendChild(h('div', { class: 'lb-leg' }, h('span', { class: 'lb-cal-ic', html: CAKE_SVG }), h('b', null, `${cap(sn)} ${b.day}`), ` ${b.name}'s birthday`));
-    for (const w of wk) legend.appendChild(h('div', { class: 'lb-leg muted' }, h('b', null, `Every ${cap(w.weekday)}`), ` ${w.text}`));
+    for (const f of fests) legend.appendChild(h('div', { class: 'lb-leg' }, h('span', { class: 'lb-cal-ic', html: STAR_SVG }), h('b', { class: 'lb-leg-date' }, `${cap(sn)} ${f.day}`), h('span', { class: 'lb-leg-text' }, f.name)));
+    for (const b of bdays) legend.appendChild(h('div', { class: 'lb-leg' }, h('span', { class: 'lb-cal-ic', html: CAKE_SVG }), h('b', { class: 'lb-leg-date' }, `${cap(sn)} ${b.day}`), h('span', { class: 'lb-leg-text one', title: `${b.name}'s birthday` }, `${b.short}'s birthday`)));
+    for (const w of wk) legend.appendChild(h('div', { class: 'lb-leg muted' }, h('span', { class: 'lb-cal-ic' }), h('b', { class: 'lb-leg-date' }, `Every ${cap(w.weekday)}`), h('span', { class: 'lb-leg-text' }, w.text)));
     if (!legend.firstChild) legend.appendChild(h('div', { class: 'lb-muted' }, 'A quiet season, nothing marked.'));
   }
   function go(d) { season = (season + d + 4) % 4; sfx('ui_tab'); paint(); }

@@ -151,7 +151,7 @@ export function toast(text, opts = {}) {
   el.toasts.appendChild(node);
   toastEls.push(node);
   while (toastEls.length > 4) { const old = toastEls.shift(); old.remove(); }
-  const ms = opts.ms || 2800;
+  const ms = opts.ms || Math.min(7000, Math.max(2800, 1400 + String(text).length * 40)); // long door texts stay readable
   setTimeout(() => node.classList.add('out'), ms);
   setTimeout(() => { node.remove(); const i = toastEls.indexOf(node); if (i >= 0) toastEls.splice(i, 1); }, ms + 450);
 }

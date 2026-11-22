@@ -192,18 +192,25 @@ export async function talkDaily(npc, pred, maxDays = 40) {
 
 export const slotOf = (item) => Game.state.inventory.slots.findIndex((s) => s && s.id === item);
 
-/** Give one `item` to `npc` (their daily gift). Returns false if the daily gift was already used. */
-export async function gift(npc, item, { sameDay = false } = {}) {
+/** Give `item` to `npc` (their daily gift). With a multi-item give-quest open, the simulated player takes the bulk hand-in
+ * ("Hand over all N") unless `one` is set ("Just one, as a gift"). Returns false if the daily gift was already used. */
+export async function gift(npc, item, { sameDay = false, one = false } = {}) {
   if (!has(item)) throw new Error(`gift: no ${item} in the pack`);
   if (!(await findNpc(npc, { sameDay }))) return false;
   if (Game.state.rel[npc].giftDay === dn()) return false;
   const slot = slotOf(item);
   Game.ui.pickItem = async () => slot;
+  const origAsk = Game.ui.dialogue.ask;
+  Game.ui.dialogue.ask = async () => (one ? 1 : 0);
   const before = svc.inventory.count(item);
-  await pump(svc.rel.giftFlow(npc));
-  await settle();
-  Game.ui.pickItem = async () => null;
-  return svc.inventory.count(item) === before - 1;
+  try {
+    await pump(svc.rel.giftFlow(npc));
+    await settle();
+  } finally {
+    Game.ui.pickItem = async () => null;
+    Game.ui.dialogue.ask = origAsk;
+  }
+  return svc.inventory.count(item) < before;
 }
 
 /** Buy at a counter shop: goes there when open. */

@@ -111,10 +111,11 @@ async function playM5() {
   assert.ok(svc.quests.isActive('m5_sailor'));
   await P.forageUntil(['harbor'], new Set(['sea_glass']), () => P.has('sea_glass', 3), 40);
   assert.equal(svc.quests.stageId('m5_sailor'), 'return');
-  for (let i = 0; i < 3; i++) {
-    assert.ok(await P.gift('gus', 'sea_glass'), `gift ${i + 1}`);
-    await P.nextDay();
-  }
+  // bulk hand-in: all three at once (one gift day), instead of one per day
+  assert.ok(await P.gift('gus', 'sea_glass'), 'bulk hand-in');
+  await P.settle();
+  assert.ok(P.questDone('m5_sailor'), 'one hand-in finishes m5');
+  if (Game.state.story.lanterns < 3) await P.nextDay(); // the lantern cutscene plays on the next event check
   assert.ok(P.questDone('m5_sailor') && Game.state.story.lanterns === 3 && P.has('sea_lens'));
 }
 

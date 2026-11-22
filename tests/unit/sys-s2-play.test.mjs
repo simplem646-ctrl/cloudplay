@@ -141,6 +141,14 @@ test('interaction: prompt + highlight + event for the object in front; confirm r
   assert.equal(env.prompt, 'Space: Mail');
   assert.equal(env.highlight, 'mailbox');
   assert.deepEqual(evts.at(-1), { kind: 'object', id: 'mailbox', label: 'Space: Mail' });
+  // the label follows the last-used device while the prompt is visible
+  Input.setDevice('touch');
+  assert.equal(env.prompt, 'A: Mail');
+  Input.setDevice('gamepad');
+  frames(0.3);
+  assert.equal(env.prompt, 'A: Mail');
+  Input.setDevice('keyboard');
+  assert.equal(env.prompt, 'Space: Mail');
   await press();
   assert.deepEqual(spy.calls, [['brook_lane', 'mailbox']]);
   Game.mode = 'dialogue';

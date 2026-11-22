@@ -613,7 +613,7 @@ test('interact: shop counter opens the right shop; closed text when closed', asy
   setDate('spring', 7, 9 * 60); // Sunday: closed
   await svc.interact.run('bakery', it('shop_bakery', 'shop'));
   assert.equal(Game.ui.of('shop').length, 0);
-  assert.equal(Game.ui.of('narrate')[0], 'The bakery is closed.');
+  assert.equal(Game.ui.of('narrate')[0], 'The bakery is closed. Open 7:00 AM – 5:00 PM, closed Sundays.');
 });
 
 test('interact: bookshelf reads books, logs them, hints active quest; sign/object examine rules', async () => {

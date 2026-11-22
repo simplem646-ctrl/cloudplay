@@ -33,6 +33,8 @@ export class InputController {
     this._vAxis = { x: 0, y: 0 };
     this._pressed = new Set();     // edge actions, valid for one frame
     this._listeners = new Set();
+    this._device = null;           // last-used device: 'keyboard' | 'gamepad' | 'touch' (null until first input)
+    this._deviceListeners = new Set();
     this._repeat = new Map();      // action -> next repeat time (ms)
     this._cleanup = [];
     /** Returns the current Game mode string; set by main/Game so Esc/M resolve contextually. */
@@ -109,6 +111,23 @@ export class InputController {
     return this._locked;
   }
 
+  // ---- last-used input device (drives prompt labels: "Space: Talk" vs "A: Talk") ----
+  get device() {
+    return this._device;
+  }
+  setDevice(d) {
+    if (!d || d === this._device) return;
+    this._device = d;
+    for (const fn of [...this._deviceListeners]) {
+      try { fn(d); } catch (err) { console.error('[input] onDevice handler threw', err); }
+    }
+  }
+  /** Subscribe to last-used-device changes. Returns unsubscribe. */
+  onDevice(fn) {
+    this._deviceListeners.add(fn);
+    return () => this._deviceListeners.delete(fn);
+  }
+
   // ---- virtual source (touch overlay / tests / debug) ----
   setVirtual(action, down) {
     if (down) {
@@ -159,6 +178,7 @@ export class InputController {
     if (typing) return;
     if (e.ctrlKey || e.metaKey || e.altKey) return;
     if (PREVENT_KEYS.has(key) && e.preventDefault) e.preventDefault();
+    this.setDevice('keyboard');
     if (e.repeat || this._keys.has(key)) return; // own repeat logic handles held directions
     const action = this.resolveKey(key);
     if (!action) return;
@@ -224,6 +244,7 @@ export class InputController {
     for (const a of want) {
       if (!this._pad.has(a)) {
         this._pad.add(a);
+        this.setDevice('gamepad');
         this._press(a, true, now);
       }
     }

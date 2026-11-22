@@ -99,7 +99,7 @@ export const SCREENS_CSS = `
 .lb-cal-icons{display:flex;gap:.1em;justify-content:flex-end}
 .lb-cal-ic{display:inline-flex;width:1.35em;height:1.35em;vertical-align:-.3em}.lb-cal-ic svg{width:100%;height:100%}
 .lb-cal-legend{display:flex;flex-direction:column;gap:.25em;background:rgba(255,250,236,.8);border:.13em solid var(--brown2);border-radius:.8em;padding:.5em .7em;min-height:0;font-size:.92em}
-.lb-leg{display:flex;align-items:center;gap:.4em;flex-wrap:wrap}
+.lb-leg{display:grid;grid-template-columns:1.35em 6.4em minmax(0,1fr);align-items:center;column-gap:.45em}.lb-leg-date{white-space:nowrap}.lb-leg-text{min-width:0}.lb-leg-text.one{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lb-leg.muted{color:var(--ink2)}
 .lb-tab-collection{overflow:auto;padding-right:.4em}
 .lb-col-sec h3{font-size:1.15em;margin:.1em 0 .4em}

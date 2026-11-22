@@ -153,7 +153,7 @@ function startTyping(textEl, text, moreEl, voice) {
 function handlePress(a) {
   if (!cur) return;
   if (cur.kind === 'say') {
-    if (a === 'confirm') advance();
+    if (a === 'confirm' || (cur.narrate && a === 'cancel')) advance(); // narration: B / X / Esc also continue
     return;
   }
   if (cur.kind === 'ask') {

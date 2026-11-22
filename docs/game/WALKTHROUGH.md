@@ -10,8 +10,10 @@
 - One conversation counts per villager per day (+12 affection). **One gift per villager per day**; the first three gifts of a
   week are worth full value, later ones count for nothing. 100 affection = 1 heart.
   Gifts: loved +80, liked +45, neutral +20, disliked -20, hated -60 (x3 on their birthday). Unvisited partial hearts melt away after 3 idle days.
-- **Give-quests take one item per day.** "Bring 3 sea glass to Gus" means three separate gifts on three days
-  (progress carries over); a quest gift still counts as that day's gift.
+- **Give-quests can be handed in all at once.** "Bring 3 sea glass to Gus": choose "Give a gift", pick the item, then
+  "Hand over all 3 for the quest" - one hand-in, which counts as that day's single gift (same reaction and affection as one
+  gift of that item). "Just one, as a gift" gives one item (progress carries over). If you already gave that villager a gift
+  today you can still deliver quest items (no affection, the daily gift stays unused).
 - Quests advance when you do the thing, but item and "be near" goals are checked every ~10 game minutes and whenever you enter an area. If a stage seems stuck, wait a few minutes or step outside and in.
 - Opening hours (closed days): bakery 07-17 (Sun), café 10-20 (Mon), town hall 09-16 (Sat, Sun), general store 09-18 (Wed),
   clinic 09-17 (Sun), library 10-18 (Tue), inn 10-22, fishing hut 06-18 (Thu), observatory 16:00 to 03:00, workshop 06-02 (locked until Odell gives you the key).
@@ -57,7 +59,7 @@ Reward: 150 c, **Ember Glass**, lantern 1 (Town Square lamps).
 ### 5. `m5_sailor` - The Sailor's Lantern (Summer 1+)
 1. Talk to **Captain Gus** (hut early, then the harbor).
 2. Forage **3 sea glass** on the harbor beach (about 5-10% per spot per day; harbor has 4 spots; it can take a week or two).
-3. Give Gus the glass: **one gift a day, three days**. Reward 150 c, **Sea Lens**, lantern 3 (Harbor lamps).
+3. Give Gus the glass: **all 3 in one hand-in** ("Hand over all 3 for the quest"). Reward 150 c, **Sea Lens**, lantern 3 (Harbor lamps).
 
 ### 6. `m6_cafe` - The Café Lantern (Summer 15+)
 1. Talk to **Rhea** at the Copper Kettle (10-20, closed Mon).
@@ -111,7 +113,7 @@ Each festival closes some shops all day, so buy what you need the day before.
 | Spring 1-3 | Prologue, bakery shift, hello tour, rod, forage, sleep; Spring 3 journal; m2. |
 | Spring 3-14 | **m3**: talk to Rosalind, two shifts, forage the woods for honey. Start courting your favourite (daily talk + a gift three times a week). Blossom Picnic on Spring 14. |
 | Spring 15 - Summer 1 | **m4** (Willa, library shelf). |
-| Summer 1-14 | **m5** (forage the harbor beach every day you are free: sea glass is the slowest item; then three gift days). Midsummer on Summer 21. |
+| Summer 1-14 | **m5** (forage the harbor beach every day you are free: sea glass is the slowest item; then one hand-in). Midsummer on Summer 21. |
 | Summer 15 - Autumn 1 | **m6** (cocoa beans, Rhea to 3 hearts). Keep foraging if m5 is still open. |
 | Autumn 1-28 | **m7** (notes, moonpetal). Autumn Moon Fair on Autumn 14. By the time m7 is done, m8 unlocks. |
 | Late autumn - Winter 23 | **m8** (workbench, Henrik, Odell). Finish your romance: the 8-heart scene before Winter 24 (Celeste's needs a clear winter night; Rhea's a Monday evening). Hearthlight on Winter 10. |

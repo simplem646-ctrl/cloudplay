@@ -171,18 +171,45 @@ export const rel = {
       const line = pool[Math.floor(rngFor('giftline', npcId, dn, r.giftsThisWeek)() * pool.length)];
       await rel._say(npcId, line);
     };
-    if (r.giftDay === dn) {
+    const needs = svc.quests?.giveNeeds?.(npcId) || {};
+    const heldNeeded = Object.keys(needs).filter((id) => svc.inventory.count(id) > 0);
+    // Already gifted today: a quest delivery is still welcome (no affection, daily gift untouched); anything else is not.
+    const deliveryOnly = r.giftDay === dn;
+    if (deliveryOnly && !heldNeeded.length) {
       await sayLine(gl.again, "You've already given me something today, but thank you!");
       return null;
     }
     const slot = await Game.ui.pickItem({
-      prompt: `Give what to ${npcShort(npcId)}?`,
-      filter: (sl) => sl && !itemDef(sl.id)?.key && itemDef(sl.id)?.category !== 'key',
+      prompt: deliveryOnly ? `Hand over what to ${npcShort(npcId)}? (quest items only)` : `Give what to ${npcShort(npcId)}?`,
+      filter: (sl) => sl && !itemDef(sl.id)?.key && itemDef(sl.id)?.category !== 'key' && (!deliveryOnly || !!needs[sl.id]),
     });
     if (slot === null || slot === undefined) return null;
     const stack = Game.state.inventory.slots[slot];
     if (!stack) return null;
     const itemId = stack.id;
+    // Bulk hand-in: several of a quest item are wanted and held.
+    let bulk = 1;
+    const held = svc.inventory.count(itemId);
+    const left = needs[itemId] || 0;
+    if (left > 1 && held >= 2) {
+      const n = Math.min(left, held);
+      const ans = await Game.ui.dialogue?.ask?.({
+        speaker: npcId,
+        prompt: `${npcShort(npcId)} needs ${left} ${itemName(itemId)} for the quest.`,
+        options: [{ text: `Hand over all ${n} for the quest` }, { text: deliveryOnly ? 'Just one' : 'Just one, as a gift' }, { text: 'Never mind' }],
+      });
+      if (ans === 0) bulk = n;
+      else if (ans !== 1) return null;
+    }
+    if (deliveryOnly) {
+      if (!needs[itemId]) return null;
+      svc.inventory.remove(itemId, bulk);
+      Game.bus.emit(REL_EVT.GIFT, { npc: npcId, item: itemId, qty: bulk, reaction: 'neutral', delivery: true });
+      Game.bus.emit(EVT.DIALOGUE_START, { id: npcId });
+      await rel._say(npcId, 'Thank you, that is just what I needed!');
+      Game.bus.emit(EVT.DIALOGUE_END, { id: npcId });
+      return { gave: itemId, qty: bulk, delivery: true, delta: 0, name: itemName(itemId) };
+    }
     const reaction = rel.preference(npcId, itemId);
     if (r.giftWeek !== week()) {
       r.giftWeek = week();
@@ -193,12 +220,13 @@ export const rel = {
     const birthday = rel.isBirthday(npcId) && (reaction === 'love' || reaction === 'like');
     if (birthday) delta *= AFFECTION.birthdayMult;
     if (capped) delta = 0;
-    inventoryRemove(slot);
+    if (bulk > 1) svc.inventory.remove(itemId, bulk);
+    else inventoryRemove(slot);
     r.giftDay = dn;
     r.giftsThisWeek += 1;
     const lg = (Game.state.log.gifts[npcId] ||= {});
-    lg[itemId] = (lg[itemId] || 0) + 1;
-    Game.bus.emit(REL_EVT.GIFT, { npc: npcId, item: itemId, qty: 1, reaction });
+    lg[itemId] = (lg[itemId] || 0) + bulk;
+    Game.bus.emit(REL_EVT.GIFT, { npc: npcId, item: itemId, qty: bulk, reaction });
     Game.bus.emit(EVT.DIALOGUE_START, { id: npcId });
     if (capped) {
       await sayLine(gl.generous, `You've been so generous this week, ${playerName()}! I really can't accept more.`);
@@ -210,7 +238,7 @@ export const rel = {
     Game.bus.emit(EVT.DIALOGUE_END, { id: npcId });
     if (delta) rel.addAff(npcId, delta);
     rel.meet(npcId);
-    return { gave: itemId, reaction, delta, birthday, capped, name: itemName(itemId) };
+    return { gave: itemId, qty: bulk, reaction, delta, birthday, capped, name: itemName(itemId) };
   },
 };
 
