@@ -38,7 +38,7 @@ export default {
     { t: 'shelf', x: 15.0, y: 1.0, w: 1.4 },
 
     // stairs up to the baker's flat
-    { t: 'stairs', x: 0.95, z: 6.5, dir: 's', w: 1.4 },
+    { t: 'loft_stairs', x: 0.95, z: 6.5, dir: 's', w: 1.4 },
 
     // shop counter: pastry cases + till counter
     { t: 'display_case', x: 6.2, z: 5.0, w: 3.6, id: 'shop_bakery', type: 'shop', label: 'Bakery counter' },

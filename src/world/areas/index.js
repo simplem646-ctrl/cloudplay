@@ -6,6 +6,15 @@
 import { AREAS, areaAnchorNames, areaInteractables, lampIds } from '../../core/registry.js';
 import brook_lane from './brook_lane.js';
 import cottage from './cottage.js';
+import library from './library.js';
+import inn from './inn.js';
+import town_hall from './town_hall.js';
+import clinic from './clinic.js';
+import fishing_hut from './fishing_hut.js';
+import workshop from './workshop.js';
+import observatory from './observatory.js';
+import whispering_woods from './whispering_woods.js';
+import starview_hill from './starview_hill.js';
 import town_square from './town_square.js';
 import market_street from './market_street.js';
 import bakery from './bakery.js';
@@ -14,7 +23,7 @@ import cafe from './cafe.js';
 import riverside_park from './riverside_park.js';
 import harbor from './harbor.js';
 
-export const BUILT = { brook_lane, cottage, town_square, market_street, bakery, general_store, cafe, riverside_park, harbor };
+export const BUILT = { brook_lane, cottage, town_square, market_street, bakery, general_store, cafe, riverside_park, harbor, library, inn, town_hall, clinic, fishing_hut, workshop, observatory, whispering_woods, starview_hill };
 
 function placeholder(id) {
   const reg = AREAS[id];

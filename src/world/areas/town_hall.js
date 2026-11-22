@@ -1,0 +1,63 @@
+/** Town Hall (interior, 16x11). White plaster and dark oak, tall windows, mayor's desk, lamplighter ledger desk, meeting table, flag. Pure data. */
+export default {
+  id: 'town_hall',
+  size: [16, 11],
+  kind: 'interior',
+  seed: 61,
+  room: {
+    wall: 'plaster', wallColor: '#f3eee0', wainscot: '#6a4a32', trim: '#fffaf0', wallH: 4.6,
+    windows: [{ at: 5.3, w: 1.3, h: 2.3, y: 1.2, curtain: '#3f5a8a' }, { at: 10.7, w: 1.3, h: 2.3, y: 1.2, curtain: '#3f5a8a' }],
+  },
+  exit: { id: 'to_town_square', at: 8 },
+  ground: {
+    base: 'planks_pale',
+    ops: [
+      { rug: { rect: [4.6, 4.0, 6.8, 4.6], style: 'floral', colors: ['#2f4a7a', '#e8d4a0', '#a8453f'] } },
+      { rug: { rect: [6.6, 8.2, 2.8, 2.4], style: 'striped', colors: ['#a8453f', '#f1dfb4', '#2f4a7a'] } },
+      { rug: { rect: [6.2, 0.6, 3.6, 2.4], style: 'round', colors: ['#7a2f3a', '#e8c880', '#2f4a7a'] } },
+    ],
+  },
+  anchors: {
+    desk_front: [8.0, 3.6, 'n'],
+    behind_desk: [7.2, 0.75, 's'],
+    meeting_table: [11.4, 6.4, 'w'],
+    window_th: [5.3, 2.5, 'n'],
+    flag_spot: [13.6, 2.4, 'n'],
+  },
+  props: [
+    // back wall, left to right: lamplighter ledger desk, window, mayor desk with portrait, window, flag
+    { t: 'wall_item', kind: 'chart', x: 2.6, y: 2.05, w: 1.3, h: 0.9 },
+    { t: 'desk', x: 2.6, z: 2.2, w: 2.4, id: 'job_lamplighter', type: 'job', label: 'Lamplighter ledger', text: 'The lamp ledger lists every street lamp in the valley and who tends it.' },
+    { t: 'stool', x: 2.6, z: 0.9 },
+    { t: 'lamp_table', x: 1.8, z: 1.6, y: 0.82 },
+    { t: 'painting', x: 8.0, y: 2.15, w: 1.9, h: 1.15 },
+    { t: 'wall_sconce', x: 6.6, y: 2.5 },
+    { t: 'wall_sconce', x: 9.4, y: 2.5 },
+    { t: 'desk', x: 8.0, z: 2.3, w: 3.4, id: 'desk_mayor', type: 'object', label: "Mayor's desk", text: "The mayor's desk is buried in neat stacks of paper and one very old teacup." },
+    { t: 'lamp_table', x: 7.0, z: 1.8, y: 0.8 },
+    { t: 'book_stack', x: 9.0, y: 0.8, z: 1.75, n: 4, colors: ['#2f4a7a', '#a8453f', '#e8d4a0'] },
+    { t: 'chair', x: 9.0, z: 0.85, dir: 's', color: '#6a4528' },
+    { t: 'wall_item', kind: 'flag', x: 13.6, y: 1.25, w: 1.4, h: 1.9, color: '#c8403a', id: 'flag_hall' },
+    { t: 'clock_wall', x: 12.2, y: 1.9 },
+    { t: 'bookcase', x: 15.38, z: 5.0, dir: 'w', w: 2.2, h: 2.8, top: 'none', spines: ['#2f4a7a', '#e8dcc0', '#a8453f', '#3f6a5a'] },
+    { t: 'plant', x: 1.0, z: 0.9, scale: 1.3 },
+    { t: 'plant', x: 15.0, z: 0.9, scale: 1.2, kind: 'flower' },
+    // meeting table
+    { t: 'table', x: 8.0, z: 6.4, w: 4.4, d: 1.4, cloth: '#2f4a7a' },
+    { t: 'candles', x: 6.7, z: 6.4, y: 0.88, n: 2 },
+    { t: 'book_stack', x: 9.3, y: 0.88, z: 6.3, n: 3 },
+    ...[6.4, 8.0, 9.6].flatMap((x) => [{ t: 'chair', x, z: 5.4, dir: 's', color: '#6a4528' }, { t: 'chair', x, z: 7.4, dir: 'n', color: '#6a4528' }]),
+    { t: 'chair', x: 5.2, z: 6.4, dir: 'e', color: '#7a4a28' },
+    { t: 'hanging_lamp', x: 6.4, z: 6.4, y: 3.2, color: '#ffe0a0' },
+    { t: 'hanging_lamp', x: 9.6, z: 6.4, y: 3.2, color: '#ffe0a0' },
+    // waiting benches and greenery near the entrance
+    { t: 'bench', x: 2.6, z: 9.7, dir: 'n', w: 2.0 },
+    { t: 'bench', x: 13.4, z: 9.7, dir: 'n', w: 2.0 },
+    { t: 'planter', x: 5.2, z: 9.9, w: 1.2 },
+    { t: 'planter', x: 10.8, z: 9.9, w: 1.2, colors: ['#ffd23f', '#fff', '#ff9a4a'] },
+    { t: 'lamp_table', x: 0.8, z: 8.4, floor: true },
+    { t: 'lamp_table', x: 15.2, z: 8.4, floor: true },
+    { t: 'barrel', x: 15.0, z: 7.6, scale: 0.8 },
+    { t: 'plant', x: 0.9, z: 5.2, scale: 1.1 },
+  ],
+};

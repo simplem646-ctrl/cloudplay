@@ -1,0 +1,66 @@
+/** Whitlock Clinic (interior, 14x10). Calm and clean: mint plaster, teal wainscot, herb jars, a made exam bed behind a screen. Pure data. */
+export default {
+  id: 'clinic',
+  size: [14, 10],
+  kind: 'interior',
+  seed: 71,
+  room: {
+    wall: 'plaster', wallColor: '#eaf4ee', wainscot: '#4f9a8a', trim: '#fcfffa', wallH: 4.0,
+    windows: [{ at: 2.3, w: 1.6, h: 1.8, y: 1.4, curtain: '#7fc0b0' }, { at: 11.6, w: 1.5, h: 1.7, y: 1.5, curtain: '#7fc0b0' }],
+  },
+  exit: { id: 'to_market_street', at: 7 },
+  ground: {
+    base: 'planks_pale',
+    ops: [
+      { rug: { rect: [7.6, 5.8, 4.4, 2.6], style: 'round', colors: ['#4f9a8a', '#f4efe0', '#e8a090'] } },
+      { rug: { rect: [3.4, 2.4, 3.4, 1.6], style: 'striped', colors: ['#7fc0b0', '#fcfffa', '#4f9a8a'] } },
+      { rug: { rect: [0.9, 5.2, 1.6, 3.2], style: 'striped', colors: ['#e8c880', '#fcfffa', '#7fc0b0'] } },
+    ],
+  },
+  anchors: {
+    reception_front: [4.8, 7.4, 'n'],
+    behind_reception: [4.8, 4.2, 's'],
+    exam_bed_spot: [11.2, 4.5, 'n'],
+    waiting_chairs: [1.9, 6.4, 'w'],
+    back_room: [8.4, 2.1, 'n'],
+  },
+  props: [
+    // back wall: window, herb cupboards, back-room door, exam bed + screen, window
+    { t: 'cupboard', x: 4.6, z: 0.65, w: 1.8, h: 2.1, color: '#d8e8e0' },
+    { t: 'shelf', x: 4.6, y: 2.55, w: 1.8 },
+    { t: 'cupboard', x: 6.4, z: 0.65, w: 1.6, h: 2.1, color: '#d8e8e0' },
+    { t: 'shelf', x: 6.4, y: 2.55, w: 1.6 },
+    { t: 'hanging_herbs', x: 3.0, z: 0.55, y: 3.3 },
+    { t: 'wall_item', kind: 'door', x: 8.4, w: 1.1, h: 2.2, color: '#d8e8e0', glowColor: '#fff0c8' },
+    { t: 'bed', x: 11.3, z: 0.45, id: 'clinic_bed', type: 'rest', color: '#8fd0c4', w: 1.6, label: 'Exam bed', text: 'A crisp, freshly made bed. Sleeping here is allowed, in moderation.' },
+    { t: 'screen', x: 9.9, z: 2.4, dir: 'e', w: 2.2, color: '#9fd0c8' },
+    { t: 'wall_item', kind: 'chart', x: 11.3, y: 2.3, w: 1.1, h: 0.8 },
+    { t: 'clock_wall', x: 13.3, y: 1.8 },
+    { t: 'plant', x: 0.9, z: 1.0, scale: 1.3 },
+    { t: 'plant', x: 13.1, z: 4.3, scale: 1.1, kind: 'flower' },
+    { t: 'rack', x: 2.0, y: 1.9 },
+    // reception
+    { t: 'counter', x: 4.8, z: 6.0, w: 3.2, id: 'shop_clinic', type: 'shop', label: 'Reception', text: 'Welcome to Whitlock Clinic.' },
+    { t: 'lamp_table', x: 3.7, z: 5.6, y: 1.1 },
+    { t: 'book_stack', x: 5.8, y: 1.1, z: 5.6, n: 3, colors: ['#4f9a8a', '#f4efe0', '#e8a090'] },
+    { t: 'candles', x: 4.7, z: 5.6, y: 1.1, n: 1, color: '#f0fff8' },
+    { t: 'stool', x: 4.8, z: 4.9 },
+    { t: 'hanging_lamp', x: 4.8, z: 5.8, y: 3.1, color: '#fff0c8' },
+    // waiting corner
+    { t: 'chair', x: 0.95, z: 5.4, dir: 'e', color: '#7fc0b0' },
+    { t: 'chair', x: 0.95, z: 6.4, dir: 'e', color: '#7fc0b0' },
+    { t: 'chair', x: 0.95, z: 7.4, dir: 'e', color: '#7fc0b0' },
+    { t: 'table', x: 0.9, z: 8.6, w: 0.9, d: 0.9, round: true, cloth: '#fcfffa' },
+    { t: 'plant', x: 0.8, z: 9.3, scale: 0.9, kind: 'flower' },
+    { t: 'lamp_table', x: 0.9, z: 8.6, y: 0.85 },
+    // exam / consulting corner
+    { t: 'table', x: 9.3, z: 5.0, w: 1.6, d: 0.9, cloth: '#fcfffa' },
+    { t: 'chair', x: 9.3, z: 4.0, dir: 's', color: '#c8e0d8' },
+    { t: 'chair', x: 9.3, z: 6.0, dir: 'n', color: '#c8e0d8' },
+    { t: 'hanging_lamp', x: 9.3, z: 5.0, y: 3.2, color: '#fff0c8' },
+    { t: 'cupboard', x: 13.3, z: 8.0, dir: 'w', w: 1.6, h: 1.8, color: '#d8e8e0' },
+    { t: 'planter', x: 11.8, z: 9.4, w: 1.3, colors: ['#ffffff', '#c8e0ff', '#ffc8d8'] },
+    { t: 'barrel', x: 13.1, z: 9.2, scale: 0.7 },
+    { t: 'lamp_table', x: 12.9, z: 6.6, floor: true },
+  ],
+};

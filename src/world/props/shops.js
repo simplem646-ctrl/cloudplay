@@ -116,7 +116,7 @@ export const coffee_machine = furniture('Brass espresso machine on a cabinet. pa
   glow(ctx, p.x, 1.2, p.z + 0.3, 1.6, '#ffb468', 0.25);
 });
 
-export const stairs = furniture('Wooden staircase up to a loft landing along a side wall (rises toward -z in its frame). params: x,z (foot centre),dir=s,w=1.4,n=11,run=3.4,rise=2.7', (ctx, p, F) => {
+export const loft_stairs = furniture('Wooden staircase up to a loft landing along a side wall (rises toward -z in its frame). params: x,z (foot centre),dir=s,w=1.4,n=11,run=3.4,rise=2.7', (ctx, p, F) => {
   const w = p.w ?? 1.4, n = p.n ?? 11, run = p.run ?? 3.4, rise = p.rise ?? 2.7;
   const sd = run / n, sh = rise / n;
   for (let i = 0; i < n; i++) {

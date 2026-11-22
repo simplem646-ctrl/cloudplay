@@ -39,7 +39,7 @@ export default {
     { t: 'piano', x: 14.0, z: 0.8, w: 2.1, id: 'piano_cf', label: 'Piano' },
 
     // stairs to the flat above
-    { t: 'stairs', x: 0.95, z: 6.5, dir: 's', w: 1.4 },
+    { t: 'loft_stairs', x: 0.95, z: 6.5, dir: 's', w: 1.4 },
 
     // long counter and cake case
     { t: 'counter', x: 8.4, z: 5.0, w: 3.6, id: 'shop_cafe', type: 'shop', label: 'Café counter' },

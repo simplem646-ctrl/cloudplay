@@ -5,9 +5,10 @@ import * as street from './street.js';
 import * as interior from './interior.js';
 import * as shops from './shops.js';
 import * as outdoor from './outdoor.js';
+import * as interiorB from './interior_b.js';
 
 export const PROPS = {};
-for (const mod of [houses, trees, street, interior, shops, outdoor]) {
+for (const mod of [houses, trees, street, interior, shops, outdoor, interiorB]) {
   for (const [k, v] of Object.entries(mod)) {
     if (v && typeof v.build === 'function') PROPS[k] = v;
   }

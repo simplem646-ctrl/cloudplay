@@ -1,0 +1,80 @@
+/** Thornfield Library (interior, 18x12). Walnut shelves, green wainscot, burgundy rugs, warm lamplight and a reading nook. Pure data. */
+export default {
+  id: 'library',
+  size: [18, 12],
+  kind: 'interior',
+  seed: 41,
+  room: {
+    wall: 'plaster', wallColor: '#e9d6aa', wainscot: '#3f5a48', trim: '#f3e8cc', wallH: 4.2,
+    windows: [{ at: 9.2, w: 1.7, h: 2.2, y: 1.15, curtain: '#2f6a58' }],
+  },
+  exit: { id: 'to_market_street', at: 9 },
+  ground: {
+    base: 'planks_dark',
+    ops: [
+      { rug: { rect: [6.2, 3.0, 5.6, 4.6], style: 'floral', colors: ['#8a2f3a', '#e8d4a0', '#3f5a48'] } },
+      { rug: { rect: [1.4, 8.0, 4.2, 3.4], style: 'round', colors: ['#2f5a5a', '#e8d4a0', '#a8453f'] } },
+      { rug: { rect: [11.4, 8.4, 4.0, 2.2], style: 'striped', colors: ['#a8743f', '#f1dfb4', '#3f5a48'] } },
+    ],
+  },
+  anchors: {
+    desk_front: [13.0, 9.2, 'n'],
+    behind_desk: [13.0, 6.2, 's'],
+    reading_nook: [3.6, 9.4, 'e'],
+    shelf_row_1: [6.0, 2.4, 'n'],
+    shelf_row_2: [13.5, 2.4, 'n'],
+    ladder: [7.6, 2.5, 'n'],
+    window_lib: [9.2, 2.5, 'n'],
+    upstairs: [1.4, 2.6, 'n'],
+  },
+  props: [
+    // staircase up along the back-left wall
+    { t: 'stairs', x: 0.5, z: 1.55, dir: 'e', n: 9, d: 1.4, color: '#a8743f' },
+    // back wall bookcases
+    { t: 'bookcase', x: 6.0, z: 0.62, w: 2.4, h: 3.2, id: 'bookshelf_lib_1' },
+    { t: 'bookcase', x: 12.3, z: 0.62, w: 2.2, h: 3.2, id: 'bookshelf_lib_2', spines: ['#3f6aa0', '#2f6a6a', '#e8dcc0', '#8a3a4a', '#d9a83a'] },
+    { t: 'bookcase', x: 14.7, z: 0.62, w: 2.2, h: 3.2, id: 'bookshelf_lib_3', top: 'none' },
+    // side walls
+    { t: 'bookcase', x: 0.62, z: 4.7, dir: 'e', w: 2.4, h: 3.2, id: 'bookshelf_lib_4', spines: ['#4f8a5a', '#d9a83a', '#a8453f', '#e8dcc0'] },
+    { t: 'bookcase', x: 0.62, z: 7.2, dir: 'e', w: 2.4, h: 3.0, id: 'bookshelf_lib_5', top: 'none' },
+    { t: 'bookcase', x: 17.38, z: 4.0, dir: 'w', w: 2.6, h: 3.2, id: 'bookshelf_lib_6', spines: ['#7a4a9a', '#c9702f', '#e8dcc0', '#3f6aa0'] },
+    { t: 'cupboard', x: 17.3, z: 7.4, dir: 'w', w: 2.0, h: 1.5, color: '#8a5a34' },
+    { t: 'ladder', x: 7.65, z: 0.95, h: 3.0 },
+    // reading window seat + curtain nook
+    { t: 'window_seat', x: 9.2, z: 1.35, w: 2.5, color: '#2f6a58' },
+    { t: 'plant', x: 7.7, z: 1.15, scale: 1.1 },
+    { t: 'painting', x: 3.5, y: 3.0, w: 1.0, h: 0.7 },
+    { t: 'clock_wall', x: 10.9, y: 2.0 },
+    { t: 'wall_sconce', x: 5.0, y: 3.5 },
+    { t: 'wall_sconce', x: 13.5, y: 3.5 },
+    { t: 'wall_item', kind: 'chart', x: 3.0, y: 1.75, w: 1.3, h: 0.9 },
+    // central reading table
+    { t: 'table', x: 8.7, z: 4.7, w: 2.8, d: 1.3, cloth: '#3f5a48' },
+    { t: 'lamp_table', x: 7.9, z: 4.6, y: 0.85 },
+    { t: 'book_stack', x: 9.6, y: 0.88, z: 4.7, n: 4 },
+    { t: 'chair', x: 7.8, z: 3.55, dir: 's', color: '#6a4528' },
+    { t: 'chair', x: 9.6, z: 3.55, dir: 's', color: '#6a4528' },
+    { t: 'chair', x: 7.8, z: 5.85, dir: 'n', color: '#6a4528' },
+    { t: 'chair', x: 9.6, z: 5.85, dir: 'n', color: '#6a4528' },
+    { t: 'hanging_lamp', x: 8.7, z: 4.7, y: 3.1, color: '#ffd28a', size: 1.2 },
+    // checkout desk
+    { t: 'counter', x: 13.0, z: 8.0, w: 3.4, id: 'desk_library', type: 'object', label: 'Checkout desk', text: 'The checkout desk, with its date stamp, a bell, and a neat tower of returns.' },
+    { t: 'lamp_table', x: 11.9, z: 7.5, y: 1.1 },
+    { t: 'book_stack', x: 14.0, y: 1.1, z: 7.5, n: 5, colors: ['#a8453f', '#3f6aa0', '#e0b24a'] },
+    { t: 'candles', x: 13.0, z: 7.4, y: 1.1, n: 2 },
+    { t: 'stool', x: 12.2, z: 5.9 },
+    { t: 'hanging_lamp', x: 13.0, z: 7.7, y: 3.0, color: '#ffc878' },
+    { t: 'book_stack', x: 15.2, z: 9.4, n: 6, floor: true },
+    // reading nook (left front)
+    { t: 'armchair', x: 2.6, z: 9.4, dir: 'e', color: '#8a2f3a' },
+    { t: 'armchair', x: 4.9, z: 10.4, dir: 'w', color: '#2f5a5a' },
+    { t: 'table', x: 3.7, z: 10.9, w: 0.9, d: 0.9, round: true },
+    { t: 'lamp_table', x: 3.7, z: 10.9, y: 0.85 },
+    { t: 'lamp_table', x: 1.0, z: 8.2, floor: true },
+    { t: 'plant', x: 1.1, z: 11.2, scale: 1.2, kind: 'flower' },
+    { t: 'globe', x: 6.4, z: 8.3, scale: 1.0 },
+    { t: 'reading_desk', x: 11.0, z: 10.7, dir: 's' },
+    { t: 'plant', x: 16.9, z: 11.2, scale: 1.1 },
+    { t: 'barrel', x: 16.4, z: 9.9, scale: 0.7 },
+  ],
+};
