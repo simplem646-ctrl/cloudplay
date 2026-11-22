@@ -129,6 +129,12 @@ T('D. every shop opens with stock; buying works', async () => {
     const res = await lastShop.onBuy(first.itemId, 1);
     if (!res || res.ok === false) problems.push(`${id}: buy ${first.itemId} failed ${JSON.stringify(res)}`);
     else if (Game.state.player.money >= money0) problems.push(`${id}: money did not drop`);
+    else {
+      // The real shop UI notifies with ui:buy {done:true} AFTER its callback traded; Systems must not trade again.
+      const money1 = Game.state.player.money, count1 = svc.inventory.count(first.itemId);
+      Game.bus.emit('ui:buy', { shopId: id, itemId: first.itemId, qty: 1, done: true });
+      if (Game.state.player.money !== money1 || svc.inventory.count(first.itemId) !== count1) problems.push(`${id}: ui:buy done:true notification traded again (double purchase)`);
+    }
   }
   if (problems.length) throw new Error(problems.join('\n  - '));
   return `${Object.keys(Data.shops).length} shops OK`;

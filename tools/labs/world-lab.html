@@ -1,0 +1,72 @@
+<!doctype html>
+<!-- World lab. Query: area, minutes, season (name|0-3), weather, q (low|medium|high), cam=x,z, zoom, lamps=lit|unlit|broken, decor=<id>, overview=1, festival, w/h via viewport, anim=ms (run frames before ready) -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>World lab</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #111; overflow: hidden; color: #eee; font: 12px system-ui, sans-serif; }
+  #lab-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+  #lab-info { position: fixed; left: 8px; top: 6px; pointer-events: none; text-shadow: 0 1px 2px #000; opacity: 0.85; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<canvas id="lab-canvas"></canvas>
+<div id="lab-info"></div>
+<script type="module">
+  import * as world from '/src/world/index.js';
+  import { lampIds } from '/src/core/registry.js';
+  const params = new URLSearchParams(location.search);
+  const q = params.get('q') || 'medium';
+  const areaId = params.get('area') || 'brook_lane';
+  const canvas = document.getElementById('lab-canvas');
+  const info = document.getElementById('lab-info');
+  window.__world = world;
+  const season = params.get('season') ?? 'spring';
+  const env = () => ({ minutes: Number(params.get('minutes') ?? 720), season: /^\d$/.test(season) ? Number(season) : season, weather: params.get('weather') || 'sunny', festival: params.get('festival') });
+  try {
+    await world.init({ canvas, quality: q, seed: 1 });
+    world.resize(window.innerWidth, window.innerHeight);
+    const area = await world.loadArea(areaId, { spawn: params.get('spawn') || undefined });
+    world.setEnvironment({ ...env(), snap: true });
+    const lamps = params.get('lamps');
+    if (lamps) world.setLampStates(Object.fromEntries(lampIds(areaId).map((id) => [id, lamps])));
+    if (params.get('decor')) world.setDecor(params.get('decor'));
+    if (params.get('cam')) { const [x, z] = params.get('cam').split(',').map(Number); world.snapCamera({ x, z }); }
+    if (params.get('zoom')) world.setCamera({ zoom: Number(params.get('zoom')) });
+    if (params.get('overview')) world.__setOverview(true);
+    if (params.get('open')) for (const t of area.transitions) world.setDoorOpen(t.id, true);
+    if (params.get('hl')) world.setHighlight(params.get('hl'));
+    const fx = params.get('fx');
+    if (fx) setInterval(() => world.playEffect(fx, { x: (world.getArea().width / 2), z: world.getArea().height / 2, count: 12 }), 500);
+    let last = performance.now();
+    const warm = Number(params.get('anim') ?? 600);
+    const t0 = last;
+    let frames = 0;
+    const frame = (now) => {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      world.update(dt);
+      world.setEnvironment(env());
+      world.render();
+      frames++;
+      if (now - t0 > warm && !window.__ready) {
+        const s = world.getStats();
+        info.textContent = `${areaId} ${q} calls ${s.drawCalls} tris ${s.triangles} fps ${s.fps}`;
+        window.__stats = s;
+        window.__ready = true;
+      }
+      requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  } catch (e) {
+    console.error('lab failed', e && e.stack || e);
+    info.textContent = 'lab failed: ' + (e && e.message);
+  }
+</script>
+</body>
+</html>

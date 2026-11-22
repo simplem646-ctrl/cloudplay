@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>UI Lab</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #6ab6e8; font-family: Nunito, system-ui, sans-serif; }
+  #backdrop { position: fixed; inset: 0; background:
+    radial-gradient(ellipse 60% 30% at 70% 72%, #7cc65e 0 60%, transparent 61%),
+    radial-gradient(ellipse 80% 38% at 20% 80%, #8fd16a 0 60%, transparent 61%),
+    radial-gradient(circle at 80% 14%, #fff6c8 0 4%, transparent 4.5%),
+    linear-gradient(#9fd8ff 0, #cdeeff 55%, #8fd16a 56%, #6fb85a 100%); }
+  #backdrop i { position: absolute; bottom: 30%; width: 6vh; height: 9vh; background: #e8c88a; border-radius: .6vh; box-shadow: 0 0 0 .5vh #c79a6b; }
+  #ui-root { position: fixed; inset: 0; overflow: hidden; touch-action: none; user-select: none; }
+</style>
+</head>
+<body>
+<div id="backdrop"><i style="left:22%"></i><i style="left:46%;height:12vh"></i><i style="left:68%"></i></div>
+<div id="ui-root"></div>
+<script type="module">
+import { Game } from '/src/core/game.js';
+import { EVT } from '/src/core/events.js';
+import * as portraits from '/src/portraits/index.js';
+import * as UI from '/src/ui/index.js';
+import { data, makeState, makeAudio, items } from './ui-fixtures.js';
+import { loadSettings } from '/src/core/state.js';
+
+const q = new URLSearchParams(location.search);
+const audioLog = [];
+const intents = [];
+Game.data = data;
+Game.state = makeState();
+Game.portraits = portraits;
+Game.audio = makeAudio(audioLog);
+Game.settings = loadSettings();
+Game.mode = 'field';
+Game.input.init(document.body);
+for (const k of ['UI_USE_ITEM', 'UI_BUY', 'UI_SELL', 'UI_SAVE', 'UI_LOAD', 'UI_NEWGAME', 'UI_SETTING', 'UI_TRACK_QUEST', 'UI_QUIT']) {
+  Game.bus.on(EVT[k], (p) => intents.push([EVT[k], p]));
+}
+// fake Systems: the real ones react to these intents; here we just do something visible
+const stMod = await import('/src/core/state.js');
+Game.bus.on(EVT.UI_SAVE, ({ slot }) => stMod.saveToSlot(slot, Game.state));
+Game.bus.on(EVT.UI_USE_ITEM, ({ slot }) => { const s = Game.state.inventory.slots[slot]; if (s) { s.qty -= 1; if (s.qty <= 0) Game.state.inventory.slots[slot] = null; Game.state.player.energy = Math.min(100, Game.state.player.energy + 20); } });
+UI.init({ root: document.getElementById('ui-root') });
+Game.ui = UI;
+window.lab = { Game, UI, EVT, audioLog, intents, items, data, results: {}, errors: [] };
+
+let last = performance.now();
+function frame(now) {
+  const dt = Math.min(0.1, (now - last) / 1000); last = now;
+  Game.input.poll(); UI.update(dt); Game.input.endFrame();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const keep = (name, p) => { window.lab.results[name] = 'pending'; p.then((v) => { window.lab.results[name] = v === undefined ? 'done' : v; }); return p; };
+await portraits.preload(['mira', 'willa', 'juno']);
+
+const stock = ['bread_loaf', 'cookie', 'cake_slice', 'honey_jar', 'berry', 'egg', 'mug', 'lantern', 'book'].map((id, i) => ({ itemId: id, price: items[id].price.buy || 50, left: i % 3 === 0 ? 5 : undefined }));
+const screens = {
+  async hud() { UI.setPrompt('Space: Talk'); UI.toast('Picked up Mushroom', { icon: 'mushroom', kind: 'item' }); },
+  async toast() { UI.toast('Picked up Mushroom x2', { icon: 'mushroom', kind: 'item' }); UI.toast('New quest: Warm Bread', { kind: 'quest' }); UI.toast('Mira likes that! ♥', { kind: 'heart' }); UI.toast('Your pockets are full', { kind: 'warn' }); },
+  async banner() { UI.banner('Summer 12', 'Midsummer Fair'); },
+  async dialogue() { keep('dialogue', UI.dialogue.say({ speaker: 'mira', text: 'Oh, good morning, Kai! I just pulled a fresh batch of bread out of the oven. Would you like to try a slice while it is still warm?', expr: 'happy' })); await sleep(2500); },
+  async dialogue_nop() { keep('dialogue', UI.dialogue.say({ speaker: 'pip', text: 'Did you know that frogs can hear with their whole bodies? I read it in a book! Probably.' })); await sleep(2200); },
+  async narrate() { keep('narrate', UI.dialogue.narrate('The lanterns of Lanternbrook had gone dark long ago, but the town still remembered how they glowed.')); await sleep(2500); },
+  async ask() { keep('ask', UI.dialogue.ask({ speaker: 'mira', prompt: 'What would you like?', expr: 'smug', options: [{ text: 'A warm roll, please.' }, { text: 'Tell me about the lanterns.' }, { text: 'Something fancy (costs 50)', disabled: true, hint: 'Not enough coins' }, { text: 'Never mind.' }] })); await sleep(300); },
+  async confirm() { keep('confirm', UI.confirm('Overwrite the save in slot 2?')); },
+  async pick() { keep('pick', UI.pickItem({ prompt: 'Choose a gift for Mira', filter: (s) => ['food', 'gift'].includes((items[s.id] || {}).category) })); },
+  async menu_items() { keep('menu', UI.menu.open('items')); },
+  async menu_people() { keep('menu', UI.menu.open('people')); },
+  async menu_quests() { keep('menu', UI.menu.open('quests')); },
+  async menu_map() { keep('menu', UI.menu.open('map')); },
+  async menu_calendar() { keep('menu', UI.menu.open('calendar')); },
+  async menu_collection() { keep('menu', UI.menu.open('collection')); },
+  async menu_settings() { keep('menu', UI.menu.open('settings')); },
+  async shop() { keep('shop', UI.shop.open({ title: 'Rye & Rose Bakery', greeting: 'Welcome in! Everything is fresh this morning.', portraitId: 'mira', stock, canSell: true, onBuy: (id, qty) => { const p = (stock.find((s) => s.itemId === id) || {}).price * qty; if (Game.state.player.money < p) return { ok: false, reason: 'Not enough coins.' }; Game.state.player.money -= p; return { ok: true }; }, onSell: (slot, qty) => { const sl = Game.state.inventory.slots[slot]; const g = (items[sl.id].price.sell || 0) * qty; Game.state.player.money += g; sl.qty -= qty; if (sl.qty <= 0) Game.state.inventory.slots[slot] = null; return { ok: true, gained: g }; } })); },
+  async notes() { keep('notes', UI.notes.read({ title: 'A Letter from Tobias', lines: ['Dear whoever finds this,', 'If you are reading these words, the old cottage has found a new keeper. I am glad of it. The lanterns will need you more than they ever needed me.', 'Start with the workshop. The key is under the third flowerpot, where I always hid it.', 'Be kind to the baker; she lights the first lantern better than anyone.', 'Yours in lamplight, Tobias'] })); },
+  async summary() { keep('summary', UI.daySummary({ earned: 340, spent: 120, fishCaught: 3, hearts: [{ npc: 'mira', delta: 2 }, { npc: 'willa', delta: 1 }], note: 'The rain stopped just in time for the stars.' })); },
+  async fishing() { keep('fishing', UI.minigames.fishing({ fish: { id: 'fish_long', name: 'Brook Trout', difficulty: 2, speed: 1, size: 31 }, rodPower: 2 })); },
+  async kneading() { keep('kneading', UI.minigames.kneading({ difficulty: 2, rounds: 3 })); },
+  async icons() {
+    const sheet = document.createElement('div');
+    sheet.style.cssText = 'position:fixed;inset:0;background:#f4e6c8;display:grid;grid-template-columns:repeat(16,1fr);gap:4px;padding:8px;z-index:50;align-content:start';
+    for (const it of Object.values(items)) { const c = document.createElement('div'); c.style.cssText = 'text-align:center;font:9px sans-serif'; c.appendChild(UI.itemIcon(it, 64)); c.append(it.id); sheet.appendChild(c); }
+    document.body.appendChild(sheet);
+  },
+  async touch() { Game.settings.touchControls = 'on'; UI.setTouch && UI.setTouch(); },
+  async title() { keep('title', UI.showTitle()); },
+  async newgame() { keep('title', UI.showTitle()); await sleep(200); Game.input.setVirtual('confirm', true); Game.input.setVirtual('confirm', false); await sleep(200); },
+  async continue() { keep('title', UI.showTitle()); },
+};
+const screen = q.get('screen') || 'hud';
+if (screen === 'title' || screen === 'newgame' || screen === 'continue') { /* title shows over backdrop */ }
+if (screen === 'continue') {
+  const st = await import('/src/core/state.js');
+  const s = makeState(); st.saveToSlot(1, s); const s2 = makeState(); s2.meta.name = 'Pip'; s2.player.money = 88; st.saveToSlot(3, s2);
+}
+if (screens[screen]) await screens[screen]();
+window.lab.screens = Object.keys(screens);
+window.lab.show = async (name) => screens[name]();
+await sleep(Number(q.get('wait') || 300));
+window.__ready = true;
+</script>
+</body>
+</html>

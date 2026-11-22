@@ -11,8 +11,10 @@ export const save = {
   init() {
     s.clear();
     s.on(EVT.UI_USE_ITEM, ({ slot }) => svc.inventory.useItem(slot));
-    s.on(EVT.UI_BUY, ({ shopId, itemId, qty }) => svc.shops.buy(shopId || svc.shops.current, itemId, qty ?? 1));
-    s.on(EVT.UI_SELL, ({ slot, qty }) => svc.shops.sell(slot, qty ?? 1));
+    // The shop UI performs the trade through its onBuy/onSell callbacks and then emits these events with done:true as a
+    // notification only — acting on those would trade twice.
+    s.on(EVT.UI_BUY, ({ shopId, itemId, qty, done }) => { if (!done) svc.shops.buy(shopId || svc.shops.current, itemId, qty ?? 1); });
+    s.on(EVT.UI_SELL, ({ slot, qty, done }) => { if (!done) svc.shops.sell(slot, qty ?? 1); });
     s.on(EVT.UI_SAVE, ({ slot }) => {
       const r = svc.director.saveGame(slot);
       toast(r.ok ? 'Game saved.' : 'Could not save.', { kind: r.ok ? 'info' : 'warn' });
