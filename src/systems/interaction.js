@@ -5,7 +5,7 @@
 import { Game } from '../core/game.js';
 import { EVT } from '../core/events.js';
 import { svc } from './svc.js';
-import { subs, npcName } from './kit.js';
+import { D, subs, npcName } from './kit.js';
 
 const NPC_RANGE = 1.45;
 const AHEAD = 0.6;
@@ -91,16 +91,19 @@ async function talkTo(npcId, counter = null) {
   }
   try {
     if (await svc.jobs?.handOver?.(npcId)) return;
+    // A third entry: the shop counter next to them, or - for a villager who runs a counterless stall (Sable's peddler stall,
+    // Hattie's flower stall) - "Browse wares". Without it those shops (data/shops.js, counter: null) could never be opened.
+    const stall = counter ? null : Object.values(D().shops || {}).find((sh) => sh.owner === npcId && !sh.counter);
+    const extra = counter ? { text: counterLabel(counter.it.type), run: () => svc.interact.run(ent.area().id, counter.it) }
+      : stall ? { text: 'Browse wares', run: () => svc.shops.openShop(stall.id) } : null;
     const i = await Game.ui?.dialogue?.ask?.({
       speaker: npcId,
       prompt: npcName(npcId),
-      options: [{ text: 'Talk' }, { text: 'Give a gift' }, ...(counter ? [{ text: counterLabel(counter.it.type) }] : []), { text: 'Never mind' }],
+      options: [{ text: 'Talk' }, { text: 'Give a gift' }, ...(extra ? [{ text: extra.text }] : []), { text: 'Never mind' }],
     });
     if (i === 0) await svc.rel.talk(npcId);
     else if (i === 1) await svc.rel.giftFlow(npcId);
-    else if (i === 2 && counter) {
-      await svc.interact.run(ent.area().id, counter.it);
-    }
+    else if (i === 2 && extra) await extra.run();
   } finally {
     const still = ent.actor(npcId);
     if (still) {

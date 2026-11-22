@@ -12,6 +12,7 @@
     "contract": "node tools/check-contract.mjs",
     "build:artifact": "node tools/build.mjs --artifact",
     "check:artifact": "node tools/check-artifact.mjs",
+    "analyze": "node tools/analyze-content.mjs",
     "e2e": "node tests/e2e/smoke.cjs"
   },
   "dependencies": {

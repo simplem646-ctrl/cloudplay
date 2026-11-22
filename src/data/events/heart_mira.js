@@ -15,7 +15,8 @@ export default events([
     ],
   }),
   H('mira', 4, {
-    area: 'bakery', at: 'kneading_table', npcAt: 'oven_spot', when: [{ time: { from: '06:00', to: '07:00' } }, { not: { weekday: 'sun' } }],
+    // the bakery opens at 07:00: the player starts the scene from the square, Mira lets them in early
+    area: 'bakery', trigger: 'town_square', at: 'kneading_table', npcAt: 'oven_spot', when: [{ time: { from: '06:00', to: '07:00' } }, { not: { weekday: 'sun' } }],
     steps: [
       ['mira', 'You came early! Good. It is the best part of the day, when everything is blue and quiet.', 'happy'],
       { anim: 'mira', name: 'knead', wait: true },

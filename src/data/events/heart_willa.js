@@ -37,14 +37,16 @@ export default events([
     ],
   }),
   H('willa', 8, {
-    area: 'town_square', at: 'stage', npcAt: 'stage', prompt: 'Willa waits for your answer, the pages trembling in her hands.',
+    area: 'town_square', trigger: false, at: 'stage', npcAt: 'stage', prompt: 'Willa waits for your answer, the pages trembling in her hands.',
     when: [{ any: [
       { all: [{ festival: 'harvest' }, { area: 'town_square' }, { time: { from: '17:00', to: '22:00' } }] },
       { all: [{ dateFrom: { season: 'autumn', day: 15 } }, { area: 'library' }, { time: { from: '15:00', to: '17:45' } }] },
     ] }],
     yes: '…Yes. I think I have been saying yes for weeks. I just did not have the words. Now I do.',
     steps: [
-      ['willa', 'Everyone is here… Why did I agree to this. My hands are shaking.', 'worried'],
+      { if: { festival: 'harvest' },
+        then: [{ say: 'willa', text: 'Everyone is here… Why did I agree to this. My hands are shaking.', expr: 'worried' }],
+        else: [{ say: 'willa', text: 'Nobody is here. Good. I could not do this with a crowd. My hands are shaking anyway.', expr: 'worried' }] },
       ['willa', '"The lantern keeper never knew she was watching him light the lamps. She only knew it was her favourite hour."', 'shy'],
       ['willa', '"She waited. And one day, someone else was waiting too, at the other end of the street."', 'happy'],
       { sfx: 'confirm_big' },

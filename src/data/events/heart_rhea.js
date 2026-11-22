@@ -36,7 +36,8 @@ export default events([
     ],
   }),
   H('rhea', 8, {
-    area: 'cafe', at: 'table_cf_1', npcAt: 'behind_counter', when: [{ weekday: 'mon' }, { time: { from: '18:00', to: '22:00' } }],
+    // the café is closed on Mondays: the player starts the scene from the square (the door), Rhea lets them in
+    area: 'cafe', trigger: 'town_square', at: 'table_cf_1', npcAt: 'behind_counter', when: [{ weekday: 'mon' }, { time: { from: '18:00', to: '22:00' } }],
     prompt: 'Rhea sets down her glass. Her voice is steady, but her hands are not.',
     yes: 'Good. I was prepared for no. I had a very elegant speech for no. Now I will have to waste it.',
     steps: [

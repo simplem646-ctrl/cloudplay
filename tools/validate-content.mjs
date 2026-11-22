@@ -498,7 +498,8 @@ export async function validateContent() {
     if (!['story', 'heart', 'friend', 'festival', 'misc'].includes(e.kind)) err(w, 'bad kind');
     if (e.npc && !isNpc(e.npc)) err(w, 'bad npc');
     if (typeof e.priority !== 'number') err(w, 'needs priority');
-    if (e.once !== true) err(w, 'needs once:true');
+    // heart_*_8 may repeat (weekly) until the confession is accepted; everything else is one-shot
+    if (e.once !== true && !(e.kind === 'heart' && /_8$/.test(id) && e.once === false && e.cooldownDays > 0)) err(w, 'needs once:true');
     if (e.music && !MUSIC_TRACKS.includes(e.music)) err(w, `bad music ${e.music}`);
     checkCond(e.when, `${w}.when`);
     checkScript(e.script, w);

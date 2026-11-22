@@ -10,7 +10,8 @@ const ROMANCE = ['mira', 'willa', 'juno', 'rhea', 'celeste'];
 export function heartEvent(npc, n, o) {
   const id = `heart_${npc}_${n}`;
   const others = ROMANCE.filter((r) => r !== npc).map((r) => ({ flag: `${r}_dating` }));
-  const when = [{ hearts: { npc, gte: n } }, { notFlag: `seen_${id}` }, ...(o.when || [])];
+  // The 8-heart confession can be postponed ("I need a little more time"): it stays eligible, once a week, until accepted.
+  const when = [{ hearts: { npc, gte: n } }, n === 8 ? { notFlag: `${npc}_dating` } : { notFlag: `seen_${id}` }, ...(o.when || [])];
   if (n > 2) when.push({ flag: `seen_heart_${npc}_${n - 2}` });
   if (n >= 6) when.push({ not: { any: others } });
   const body = o.steps.map((s) => (Array.isArray(s) ? { say: s[0], text: s[1], expr: s[2] || 'neutral' } : s));
@@ -28,8 +29,8 @@ export function heartEvent(npc, n, o) {
     ], prompt: o.prompt || 'How do you feel?', speaker: npc });
   }
   return {
-    id, kind: 'heart', npc, priority: 60 + n, once: true, music: o.music || 'romance',
-    when: [...when, { area: o.area }],
+    id, kind: 'heart', npc, priority: 60 + n, ...(n === 8 ? { once: false, cooldownDays: 7 } : { once: true }), music: o.music || 'romance',
+    when: [...when, ...((o.trigger === undefined ? o.area : o.trigger) ? [{ area: o.trigger === undefined ? o.area : o.trigger }] : [])],
     script: [
       { setFlag: `seen_${id}` }, { letterbox: true }, { fade: 'out', ms: 300 },
       { area: o.area, at: o.at }, { place: 'player', at: o.at, facing: 's' }, { place: npc, at: o.npcAt || o.at, area: o.area, facing: 'player' },

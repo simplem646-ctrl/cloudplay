@@ -122,7 +122,7 @@ const MAIN = [
         say('rhea', 'He came every dusk for one cup. I wrote his recipe down and never served it again.', 'sad'),
         say('rhea', 'I am not ready to share it. Bring me cocoa beans and show me you are serious.', 'smug'),
       ] }),
-      { id: 'beans', text: 'Bring 2 cocoa beans for Rhea (from the café or the peddler).', goal: { type: 'have', item: 'cocoa_beans', qty: 2 } },
+      { id: 'beans', text: 'Bring 2 cocoa beans for Rhea (sold at the café).', goal: { type: 'have', item: 'cocoa_beans', qty: 2 } },
       { id: 'trust', text: 'Earn Rhea\'s trust. Reach 3 hearts with her.', goal: { type: 'hearts', npc: 'rhea', hearts: 3 }, onDone: [
         say('rhea', 'Fine. You win. Sit down. This is how he took it, and how the lamp oil is made.', 'happy'),
         { giveItem: 'rhea_recipe_card' },
