@@ -23,6 +23,14 @@ import { tutorial } from './tutorial.js';
 import { director } from './director.js';
 import { save } from './save.js';
 import { debug } from './debug.js';
+import { path } from './path.js';
+import { lamps } from './lamps.js';
+import { player } from './player.js';
+import { interaction } from './interaction.js';
+import { npcs } from './npcs.js';
+import { activities } from './activities.js';
+import { jobs } from './jobs.js';
+import { entities } from './entities.js';
 
 // S1 services (order matters: clock/weather before anything that reacts to time:newday)
 registerService('clock', clock);
@@ -40,7 +48,17 @@ registerService('tutorial', tutorial);
 registerService('director', director);
 registerService('save', save);
 registerService('debug', debug);
-// S2 services are registered below this line.
+// S2 services are registered below this line. Update order matters: player moves before entities steps the rigs + camera.
+// The world-facing half goes live in init() only when Game.world.loadArea exists (staging ops + fishing/forage/lamp handlers),
+// so the pure S1 tests (no world) keep their no-S2 behaviour.
+registerService('path', path);
+registerService('lamps', lamps);
+registerService('player', player);
+registerService('interaction', interaction);
+registerService('npcs', npcs);
+registerService('activities', activities);
+registerService('jobs', jobs);
+registerService('entities', entities);
 
 export { svc, registerService };
 export const init = () => initServices();

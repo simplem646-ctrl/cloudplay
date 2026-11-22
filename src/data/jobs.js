@@ -33,7 +33,7 @@ export default {
   },
   lamplighter: {
     id: 'lamplighter', name: 'Lamplighter', boss: 'odell', area: 'town_hall', spot: 'job_lamplighter',
-    days: ALL_DAYS, from: '17:30', to: '19:30', energy: 10, kind: 'lamplighter', pay: { base: 6, bonus: 40 },
+    days: ['mon', 'tue', 'wed', 'thu', 'fri'], from: '17:30', to: '19:30', energy: 10, kind: 'lamplighter', pay: { base: 6, bonus: 40 },
     desc: 'Light every repaired street lamp at dusk. Light them all for a bonus.',
     intro: [
       { say: 'odell', text: 'Ah, the lamplighter! Tobias did this every dusk for forty years. Now it is your turn.', expr: 'happy' },

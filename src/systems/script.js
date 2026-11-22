@@ -286,6 +286,7 @@ reg('mail', async (s) => { svc.mail?.send(s.mail); });
 // ---- presentation ----
 reg('fade', async (s) => {
   const out = s.fade === 'out';
+  opts.faded = out;
   await Game.ui?.fade?.(out ? 1 : 0, opts.skipFades ? 0 : s.ms ?? 500, s.color || '#000');
 });
 reg('title', async (s) => { await Game.ui?.banner?.(interpolate(s.title), s.sub ? interpolate(s.sub) : undefined, s.ms); });

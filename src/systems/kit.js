@@ -3,8 +3,8 @@ import { Game } from '../core/game.js';
 import { EVT } from '../core/events.js';
 import { dayNumber, seasonName, weekdayName, deepClone } from '../core/util.js';
 
-/** Debug/test switches. skipFades makes fade/wait script ops instant. */
-export const opts = { skipFades: false };
+/** Debug/test switches. skipFades makes fade/wait script ops instant. `faded` = a script faded the screen out (set by the fade op; S2 area changes then skip their own fade). */
+export const opts = { skipFades: false, faded: false };
 
 export const D = () => Game.data || {};
 export const S = () => Game.state;

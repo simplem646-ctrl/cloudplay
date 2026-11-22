@@ -64,3 +64,26 @@ ask unless they `end`/`goto`; `goto` unwinds to top-level labels; `call` is a su
 (and `{cutscene:true}`) run in `cutscene` mode and restore the previous mode. `quests.advance/complete` called from a script op
 are not awaited (they queue behind the running script); `await svc.quests.idle()` to wait.
 Debug: `LB.skipFades(true)` makes `fade`/`wait` instant.
+
+## S2 — world-facing half (live only when `Game.world.loadArea` exists at `Systems.init()`)
+
+Fill **every** `Game` slot (`data world chars ui audio portraits systems`) before `Systems.init()` — see the header of `tools/labs/play-lab.html`,
+the reference wiring for `src/main.js`. Without a real world the S2 services stay inert (pure S1 tests keep passing): the staging ops and the
+fishing / forage / lamp handlers are only registered when a world is present.
+
+| file / service | role |
+|---|---|
+| `path.js` `svc.path` | A* on `area.grid` (8-dir, no corner cutting, smoothed tile-centre waypoints, cached); `find(area,sx,sz,gx,gz) → [{x,z}] \| [] \| null` |
+| `entities.js` `svc.entities` | loaded area, actors (player + NPC rigs), critters, scripted camera, `enterArea`, `getPlayerPos`, `walk/teleport`, `ensureRig`, music/ambience/lamps/decor on entry |
+| `npcs.js` `svc.npcs` | `whereIs(npc, minutes?)` (schedules + festival placement), populate on entry, 5-minute sync (walk / leave via the exit and despawn / arrive from `from_<hop>`), wandering, `resyncAll` after cutscenes |
+| `player.js` `svc.player` | stick movement, 4-way facing, footsteps, soft NPC collision, transitions (closed buildings: toast + nudge back; lamplighter may enter the hall after hours) |
+| `interaction.js` `svc.interaction` | best NPC/interactable in front → prompt, highlight, `interact:target`; NPC menu Talk / Give a gift (`svc.jobs.handOver` first) |
+| `activities.js` `svc.activities` | `fishing` (rod, seeded fish by water/season/weather/time), `forage` (one seeded roll per spot and day), `lamp` handlers |
+| `lamps.js` `svc.lamps` | broken / unlit / lit (story, dusk 17:30-06:00, festival nights, script override) → `world.setLampStates` |
+| `jobs.js` `svc.jobs` | bakery shift, parcel run (parcels live in `state.jobs.parcel`), lamplighter (`state.jobs.lamp`) |
+| `staging.js` | script ops `area place move face anim expr emote hold camera hide show effect lamps decor` |
+| `audio-director.js` | `pickMusic(ctx)` / `apply(area)`: town_<season> by day, night after 18:30, town_rain, festival(_winter) in the festival window |
+
+Staged NPCs (any staging op names them) are exempt from schedule movement until the script ends; `event:end` re-syncs everybody.
+Kit additions: `opts.faded` (set by the `fade` op) so an `area` change inside a faded-out cutscene does not fade on its own.
+Tests: `tests/unit/sys-s2-*.test.mjs` (REAL data + REAL headless areas, fake rigs/UI; `tests/unit/fixtures/sys-s2-env.mjs`).

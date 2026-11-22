@@ -202,7 +202,7 @@ henrik Winter 3 · rhea Winter 6 · elias Winter 12 · celeste Winter 18 · bram
 |---|---|---|---|
 | **Bakery Helper** | Rosalind (spot `job_bakery`) | Mon–Sat 07:00–11:00 | UI mini‑game **kneading** (rhythm/timing, 3 rounds); pay by score; affection to Mira & Rosalind. |
 | **Parcel Runner** | Theo (spot `post_counter`) | Mon–Sat 13:00–17:00 | Pick up 3–5 parcels with addressee names; find each NPC (use their schedules!) and hand over before the deadline. Pay by speed. |
-| **Lamplighter** | Mayor Odell (spot `job_lamplighter`) | nightly 17:30–19:30 (after prologue) | Walk the lamps and **light** each *repaired* lamp (`lamp` interactable). Lit lamps stay lit all night. Pay per lamp. |
+| **Lamplighter** | Mayor Odell (spot `job_lamplighter`) | Mon–Fri 17:30–19:30 (the hall is closed at weekends; lamps can still be lit by hand, unpaid) | Walk the lamps and **light** each *repaired* lamp (`lamp` interactable). Lit lamps stay lit all night. Pay per lamp. |
 | **Fishing** (activity) | — | any time; rod needed (`fishing_rod` key item) | Cast at a `fishing` spot → wait → bite → UI mini‑game (**fishing** timing/tension bar). Fish depend on spot water kind, season, weather, time. |
 | **Foraging** (activity) | — | any time | `forage` spots refill daily from a seeded table by area & season. |
 | **Stargazing** (activity) | — | night, at a `telescope` | short calm scene; some constellations unlock Celeste dialogue. |

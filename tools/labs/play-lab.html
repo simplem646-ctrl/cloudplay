@@ -1,0 +1,141 @@
+<!doctype html>
+<!--
+  PLAY LAB — boots the REAL stack exactly the way src/main.js will: world + characters + ui + audio + portraits + data + systems.
+  The final src/main.js can reuse this wiring 1:1 (steps 1-6 below); the lab only adds the ?query shortcuts.
+
+  Wiring (mirror this in main.js):
+    1. Game.settings = loadSettings(); quality from ?q or settings
+    2. Game.data = Data; Game.world = world; Game.chars = characters; Game.ui = ui; Game.audio = audio; Game.portraits = portraits; Game.systems = Systems
+       (ALL slots must be filled BEFORE Systems.init(): the world-facing systems/staging ops go live only when Game.world.loadArea exists)
+    3. Input.init(canvas); audio.init(); unlock audio on the first key/pointer
+    4. await world.init({canvas, quality}); ui.init({root}); Systems.init() (preloads chars); portraits.preload() (idle)
+    5. frame loop: Input.poll() -> Systems.update(dt) -> World.update(dt) -> World.setEnvironment({minutes,season,weather}) -> UI.update(dt)
+       -> World.render() -> Input.endFrame()
+    6. Systems.start()  (title -> new/continue -> prologue -> field)
+
+  Query params: ?q=low|medium|high  &autostart=<name>  &area=<id> &anchor=<name>  &minutes=<n> &season=<name|0-3> &day=<1-28> &weather=<w>
+                &skipPrologue=1  &fades=0 (instant fades/waits)  &run=<scriptId>  &money=<n>  &give=<item,item>  &lanterns=<0-6>  &hud=0
+  Without autostart the real title screen is shown. Exposes window.__lab = {Game, Systems, LB, svc, Data}; window.__ready = true once
+  the first frame ran (and, with autostart, the game is in the field).
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Play lab</title>
+<style>
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
+  body { touch-action: none; user-select: none; -webkit-user-select: none; font-family: Nunito, system-ui, sans-serif; }
+  #game-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; background: #000; outline: none; touch-action: none; }
+  #ui-root { position: fixed; inset: 0; overflow: hidden; touch-action: none; user-select: none; }
+</style>
+<script type="importmap">
+{ "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<canvas id="game-canvas" tabindex="0"></canvas>
+<div id="ui-root"></div>
+<script type="module">
+  import { Game } from '/src/core/game.js';
+  import { Input } from '/src/core/input.js';
+  import { loadSettings } from '/src/core/state.js';
+  import { createLoop } from '/src/core/loop.js';
+  import { installDebug } from '/src/core/debug.js';
+  import * as world from '/src/world/index.js';
+  import * as characters from '/src/characters/index.js';
+  import * as ui from '/src/ui/index.js';
+  import * as audio from '/src/audio/index.js';
+  import * as portraits from '/src/portraits/index.js';
+  import * as Systems from '/src/systems/index.js';
+  import { Data } from '/src/data/index.js';
+
+  const P = Game.params;
+  const num = (k, d) => (P.has(k) && P.get(k) !== '' && !Number.isNaN(Number(P.get(k))) ? Number(P.get(k)) : d);
+  const canvas = document.getElementById('game-canvas');
+  const root = document.getElementById('ui-root');
+
+  async function boot() {
+    // 1-2: settings + module slots (every slot before Systems.init)
+    Game.settings = loadSettings();
+    const q = P.get('q');
+    const quality = ['low', 'medium', 'high'].includes(q) ? q : Game.settings.quality || 'medium';
+    Game.settings.quality = quality;
+    Game.data = Data;
+    Game.world = world;
+    Game.chars = characters;
+    Game.ui = ui;
+    Game.audio = audio;
+    Game.portraits = portraits;
+    Game.systems = Systems;
+
+    // 3: input + audio
+    Input.init(canvas);
+    Game.audio.init();
+    const unlock = () => Game.audio.unlock();
+    window.addEventListener('pointerdown', unlock, { once: true });
+    window.addEventListener('keydown', unlock, { once: true });
+
+    // 4: engines
+    await Game.world.init({ canvas, quality });
+    Game.ui.init({ root });
+    Systems.init();
+    Game.portraits.preload?.();
+    const LB = installDebug();
+    window.addEventListener('resize', () => Game.world.resize(window.innerWidth, window.innerHeight));
+    Game.world.resize(window.innerWidth, window.innerHeight);
+    if (P.get('fades') === '0') LB.skipFades(true);
+    window.__lab = { Game, Systems, LB, svc: Systems.svc, Data, world, audio, ui };
+
+    // 5: frame loop (ARCHITECTURE section 10 order)
+    let gameStarted = !(P.has('autostart') || P.has('run'));
+    let frames = 0;
+    const loop = createLoop((dt) => {
+      Input.poll();
+      Game.systems.update(dt);
+      Game.world.update(dt);
+      const s = Game.state;
+      if (s) Game.world.setEnvironment({ minutes: s.time.minutes, season: s.time.season, weather: s.weather.today });
+      Game.ui.update(dt);
+      Game.world.render();
+      Input.endFrame();
+      frames++;
+      if (frames > 2 && gameStarted && !window.__ready) window.__ready = true;
+    });
+    loop.start();
+    LB.register('fps', () => loop.fps);
+
+    // 6: start
+    if (P.has('autostart') || P.has('run')) {
+      const name = P.get('autostart') || 'Kai';
+      Game.bus.on('game:new', () => {
+        const st = Game.state;
+        if (P.get('skipPrologue') || P.has('run')) st.flags.prologue_done = true;
+        const t = {};
+        if (P.has('season')) t.season = /^\d$/.test(P.get('season')) ? Number(P.get('season')) : P.get('season');
+        if (P.has('day')) t.day = num('day', 1);
+        if (P.has('minutes')) t.minutes = num('minutes', 540);
+        if (Object.keys(t).length) Systems.svc.clock.set(t);
+        if (P.has('lanterns')) st.story.lanterns = num('lanterns', 0);
+        if (P.has('money')) st.player.money = num('money', 300);
+        Systems.svc.weather.reroll();
+        if (P.has('weather')) st.weather.today = P.get('weather');
+      });
+      Game.bus.once('area:enter', () => { gameStarted = true; }); // ready once the first area is up (the prologue may still be running)
+      await Systems.newGame({ name });
+      for (const id of (P.get('give') || '').split(',').filter(Boolean)) Systems.svc.inventory.give(id, 1, { silent: true });
+      if (P.has('area') && P.get('area') !== Game.state.player.area) await Systems.svc.entities.enterArea(P.get('area'), P.get('anchor') || undefined);
+      if (P.get('hud') === '0') Game.ui.hudVisible(false);
+      if (P.has('run')) await Systems.runScript(P.get('run'), { cutscene: true });
+    } else {
+      await Systems.start();
+    }
+  }
+
+  boot().catch((err) => {
+    console.error('[play-lab] boot failed', err && err.stack || err);
+    root.textContent = `Boot failed: ${err && err.message}`;
+  });
+</script>
+</body>
+</html>
