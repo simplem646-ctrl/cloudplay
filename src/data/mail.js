@@ -64,7 +64,7 @@ const FLAVOUR = [
     'The beach has new shells. Gulls are asked to stop stealing sandwiches.',
   ], from('summer', 5)),
   M('mail_news_autumn', 'town', 'The Lanternbrook Times: Autumn', [
-    'Harvest Moon Fair on Autumn 14, with a fishing contest and a bake-off.',
+    'Autumn Moon Fair on Autumn 14, with a fishing contest and a bake-off.',
     'Willa Thorne will give a public reading. Expect cake.',
   ], from('autumn', 5)),
   M('mail_news_winter', 'town', 'The Lanternbrook Times: Winter', [

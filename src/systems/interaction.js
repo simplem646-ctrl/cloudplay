@@ -16,6 +16,9 @@ export const LABELS = {
   diary: 'Save', chest: 'Chest', job: 'Work', bench: 'Sit', rest: 'Rest', fountain: 'Make a wish', shrine: 'Pray', telescope: 'Look',
   bookshelf: 'Browse', crafting: 'Craft', object: 'Look',
 };
+/** Object types that stay usable when a person stands in front of them: offered as an extra choice in that person's menu. */
+const ALSO = new Set(['shop', 'job', 'lamp']);
+const counterLabel = (type) => (type === 'job' ? 'Work' : type === 'shop' ? 'Shop' : LABELS[type] || 'Use');
 export const promptFor = (type) => `Space: ${LABELS[type] || 'Use'}`;
 
 const s = subs();
@@ -44,20 +47,30 @@ function pick(ent, a, area) {
       best = { kind: 'npc', id: o.id, label: `Space: Talk`, actor: o };
     }
   }
+  let counter = null; // nearest usable object, offered in the NPC menu when a person stands in front of it (Theo at the post counter, a villager by a lamp)
+  let counterD = Infinity;
   for (const it of area.interactables) {
     const d = Math.hypot(it.x - ax, it.z - az);
     if (d > (it.r || 1) + 0.5) continue;
+    if (ALSO.has(it.type) && d < counterD) {
+      counterD = d;
+      counter = { kind: 'object', id: it.id, label: promptFor(it.type), it };
+    }
     if (d < bestD) {
       bestD = d;
       best = { kind: 'object', id: it.id, label: promptFor(it.type), it };
     }
   }
+  if (best && best.kind === 'npc' && counter) best.counter = counter;
   return best;
 }
 
 function setTarget(t) {
   const same = (!t && !target) || (t && target && t.id === target.id && t.kind === target.kind);
-  if (same) return;
+  if (same) {
+    target = t; // keep the fresh pick (its `counter` may have changed) without re-emitting
+    return;
+  }
   target = t;
   Game.ui?.setPrompt?.(t ? t.label : null);
   Game.world?.setHighlight?.(t && t.kind === 'object' ? t.id : null);
@@ -65,7 +78,7 @@ function setTarget(t) {
 }
 
 /** Talk / gift menu for an NPC (parcel hand-over first). */
-async function talkTo(npcId) {
+async function talkTo(npcId, counter = null) {
   const ent = svc.entities;
   const a = ent.actor(npcId);
   const pa = ent.playerActor();
@@ -81,10 +94,13 @@ async function talkTo(npcId) {
     const i = await Game.ui?.dialogue?.ask?.({
       speaker: npcId,
       prompt: npcName(npcId),
-      options: [{ text: 'Talk' }, { text: 'Give a gift' }, { text: 'Never mind' }],
+      options: [{ text: 'Talk' }, { text: 'Give a gift' }, ...(counter ? [{ text: counterLabel(counter.it.type) }] : []), { text: 'Never mind' }],
     });
     if (i === 0) await svc.rel.talk(npcId);
     else if (i === 1) await svc.rel.giftFlow(npcId);
+    else if (i === 2 && counter) {
+      await svc.interact.run(ent.area().id, counter.it);
+    }
   } finally {
     const still = ent.actor(npcId);
     if (still) {
@@ -113,7 +129,7 @@ export const interaction = {
       const ent = svc.entities;
       const area = ent.area();
       setTarget(null);
-      if (t.kind === 'npc') await talkTo(t.id);
+      if (t.kind === 'npc') await talkTo(t.id, t.counter);
       else {
         const pa = ent.playerActor();
         if (pa && t.it) pa.rig?.faceTowards?.(t.it.x, t.it.z);

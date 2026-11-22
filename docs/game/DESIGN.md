@@ -168,7 +168,7 @@ person who made the town feel looked‑after.
 | NPC | 2 ♥ | 4 ♥ | 6 ♥ | 8 ♥ (confession) |
 |---|---|---|---|---|
 | mira | **Flour Fright** — bakery morning; she trips with a flour sack; comedy; gives you a warm roll | **Before Sunrise** — 05:30 bakery, she teaches kneading, confides her café‑bakery dream | **The Notebook** — park at dusk; her recipe notebook, fear of leaving her mother | **Rise and Shine** — Rosalind & Mira reconcile with your help; dawn picnic on starview_hill; confession |
-| willa | **Rainy Day Stacks** — library on a rainy day; shows you the reading nook | **Lend Me a Book** — she lends you a battered storybook; blush | **Under the Stars** — hill at night; reads you a story she wrote | **The Reading** — Harvest Moon Fair public reading (needs Autumn 14+ & ≥8♥); confession |
+| willa | **Rainy Day Stacks** — library on a rainy day; shows you the reading nook | **Lend Me a Book** — she lends you a battered storybook; blush | **Under the Stars** — hill at night; reads you a story she wrote | **The Reading** — Autumn Moon Fair public reading (needs Autumn 14+ & ≥8♥); confession |
 | juno | **The Challenge** — pier fishing duel | **Storm Warning** — stormy day; securing boats together | **Gramps' Sea Chest** — hut; her parents, her fear of being left | **First Light** — relight the lighthouse at dusk together; confession |
 | rhea | **Taste Test** — she critiques your palate; surprise approval | **After Hours** — café at night, she makes you cocoa, hums | **Why I Left** — rainy evening, the city kitchen story | **The Tasting Menu** — private dinner at the closed café; confession |
 | celeste | **First Constellation** — hill at night; the telescope | **Meteor Night** — meteor shower on the hill (summer/autumn night) | **The Missing Star** — observatory; her mentor, the lamp‑constellation theory | **Lantern Sky** — winter night; Great Lantern + stars; confession |
@@ -187,7 +187,7 @@ with 2–3 daily jobs: deliver an item, bring N of something, catch a fish type,
 |---|---|---|
 | Spring 14 | **Blossom Picnic** — share a picnic basket with someone (choose) | riverside_park |
 | Summer 21 | **Midsummer Lights** — evening on the beach, fireworks | harbor |
-| Autumn 14 | **Harvest Moon Fair** — stalls, fishing contest, bake‑off, Willa's reading | town_square |
+| Autumn 14 | **Autumn Moon Fair** — stalls, fishing contest, bake‑off, Willa's reading | town_square |
 | Winter 10 | **Hearthlight Evening** — cosy gift‑exchange at the inn | inn |
 | Winter 24 | **Lantern Festival** (finale) | town_square → riverside_park |
 | Sat & Sun | Sable's peddler stall | town_square (Sat) / riverside_park (Sun) |

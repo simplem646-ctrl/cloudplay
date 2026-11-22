@@ -4,7 +4,8 @@
  *   npm run e2e            (not part of `npm test`: slow, needs the host Playwright)
  *
  * boot -> title -> keyboard-only new game -> prologue (Enter) -> held-key walking -> cottage door in/out -> area hops (incl. interiors)
- * -> talk to an NPC (dialogue + portrait) -> shop purchase -> sleep (day summary) -> save -> load -> Escape menu open/close.
+ * -> talk to an NPC (dialogue + portrait) -> shop purchase -> sleep (day summary) -> save -> load -> Escape menu open/close
+ * -> closed shop door -> gift to a villager -> Gus' rod + fishing (cast, bite, held Space) -> lamp lighting -> a heart event -> reload + Continue + export dialog.
  * Prints one PASS/FAIL line per step, saves screenshots to ${TMPDIR:-/tmp}/orchestrate/t14/e2e_*.png, exits non-zero on any failure.
  */
 const { execFileSync } = require('node:child_process');
@@ -58,6 +59,19 @@ async function main() {
     try { const detail = await fn(); log(true, name, detail); } catch (e) { log(false, name, String((e && e.message) || e).split('\n')[0].slice(0, 200)); try { await shot(`FAIL_${name.replace(/\W+/g, '_')}`); } catch (_) { /* ignore */ } }
   };
   const assert = (cond, msg) => { if (!cond) throw new Error(msg); };
+  // press Space until the game is back in free roam (dialogue, narration, cutscenes)
+  const drain = async (n = 60) => { for (let i = 0; i < n && await ev('window.__game.Game.mode') !== 'field'; i++) { await press('Space', 50); await sleep(200); } return (await ev('window.__game.Game.mode')) === 'field'; };
+  const gotoArea = async (id) => {
+    ev(`window.__game.LB.goto('${id}')`).catch(() => {});
+    await waitFor(`window.__game.Game.state.player.area === '${id}'`, 40000);
+    await sleep(500);
+    await drain();
+  };
+  // stand in front of an interactable (optionally offset) and wait until it is the interaction target
+  const standAt = async (id, dx = 0, dz = 0.9) => {
+    await ev(`(() => { const e = window.__game.svc.entities, it = e.area().interactables.find((i) => i.id === '${id}'), p = e.playerActor(); e.teleport(p, it.x + (${dx}), it.z + (${dz}), 'n'); p.facing = 'n'; p.rig.faceTowards(it.x, it.z); })()`);
+    await waitFor(`window.__game.svc.interaction.target && window.__game.svc.interaction.target.id === '${id}'`, 6000);
+  };
 
   try {
     await step('boot: bundle runs, __ready, loading overlay gone', async () => {
@@ -209,6 +223,135 @@ async function main() {
       await shot('11_menu');
       await press('Escape');
       await waitFor("window.__game.Game.mode === 'field' && !document.querySelector('[data-testid=menu]')", 10000);
+    });
+
+    await step('closed shop: walking into the bakery door at night shows its sign and stays outside', async () => {
+      await ev('window.__game.LB.date(0, 2)');
+      await ev('window.__game.LB.time(22)');
+      await gotoArea('town_square');
+      const r = await ev("window.__game.svc.entities.area().transitions.find((t) => t.to.area === 'bakery').rect");
+      await ev(`(() => { const e = window.__game.svc.entities; e.teleport(e.playerActor(), ${r.x + r.w / 2}, ${r.z + r.h + 1.2}, 'n'); })()`);
+      await sleep(300);
+      await ev("document.querySelectorAll('.lb-toast').forEach((t) => t.remove())");
+      await page.keyboard.down('ArrowUp');
+      let toast = '';
+      for (let i = 0; i < 70 && !/Rye & Rose is closed/.test(toast); i++) { await sleep(200); toast = await ev("[...document.querySelectorAll('.lb-toast')].map((t) => t.innerText).join(' ')"); }
+      await page.keyboard.up('ArrowUp');
+      assert(/Rye & Rose is closed/.test(toast), `no closed-door toast (${toast.slice(0, 80)})`);
+      assert(await ev('window.__game.Game.state.player.area') === 'town_square', 'walked in through a closed door');
+    });
+
+    await step('gift: Space -> Give a gift -> pick a loved item -> reaction line and hearts', async () => {
+      await ev('window.__game.LB.time(10)');
+      await gotoArea('town_hall');
+      await ev("window.__game.LB.give('apple_pie', 1)");
+      await ev("(() => { const e = window.__game.svc.entities, a = e.actor('odell'), p = e.playerActor(); a.busy = true; e.teleport(p, a.x - 1.0, a.z); p.facing = 'e'; p.rig.faceTowards(a.x, a.z); })()");
+      await waitFor("window.__game.svc.interaction.target && window.__game.svc.interaction.target.kind === 'npc'", 8000);
+      const aff0 = await ev("window.__game.svc.rel.aff('odell')");
+      await press('Space');
+      await waitFor("document.querySelectorAll('[data-testid=dialogue-option]').length >= 3", 10000);
+      await press('ArrowDown'); await press('Space'); // Give a gift
+      await waitFor("!!document.querySelector('[data-testid=slotgrid]')", 10000);
+      const idx = await ev("window.__game.Game.state.inventory.slots.findIndex((s) => s && s.id === 'apple_pie')");
+      let cur = await ev("(() => { const c = document.querySelector('.lb-slot.is-sel'); return c ? Number(c.dataset.i) : 0; })()");
+      while (Math.floor(cur / 6) < Math.floor(idx / 6)) { await press('ArrowDown'); cur += 6; }
+      while (cur % 6 < idx % 6) { await press('ArrowRight'); cur++; }
+      while (cur % 6 > idx % 6) { await press('ArrowLeft'); cur--; }
+      await press('Space');
+      await waitFor("(() => { const d = document.querySelector('[data-testid=dialogue]'); return d && !d.hidden && d.querySelector('[data-testid=dialogue-text]').innerText.length > 3; })()", 12000);
+      await shot('12_gift_reaction');
+      assert(await drain(), 'did not return to free roam after the gift');
+      await ev("window.__game.svc.entities.actor('odell').busy = false");
+      const aff1 = await ev("window.__game.svc.rel.aff('odell')");
+      assert(aff1 > aff0, `affection ${aff0} -> ${aff1}`);
+      assert(await ev("window.__game.svc.inventory.count('apple_pie')") === 0, 'the gift was not consumed');
+      return `affection ${aff0} -> ${aff1}`;
+    });
+
+    await step('fishing: Gus lends a rod, cast at the pier, bite, hold Space in the minigame, the catch is recorded', async () => {
+      await ev('window.__game.LB.time(9)');
+      ev("window.__game.LB.goto('fishing_hut')").catch(() => {});
+      await waitFor("window.__game.Game.state.player.area === 'fishing_hut'", 40000);
+      await sleep(600);
+      assert(await drain(), 'Gus dialogue did not end');
+      assert(await ev("window.__game.svc.inventory.count('fishing_rod')") >= 1, "Gus did not hand over the rod (quest 't_first_catch' not started?)");
+      await gotoArea('harbor');
+      await ev("(() => { const r = window.__game.svc.entities.getPlayerRig(); const o = r.play; r.play = (n, ...a) => { window.__lastAnim = n; return o.call(r, n, ...a); }; return 1; })()");
+      let caught = 0;
+      for (let attempt = 0; attempt < 3 && !caught; attempt++) {
+        await ev('(window.__lastAnim = null, window.__game.LB.time(9))');
+        await standAt('fishing_hb_1');
+        await press('Space'); // cast
+        let hit = false;
+        for (let t0 = Date.now(); Date.now() - t0 < 45000 && !await ev("!!document.querySelector('[data-testid=fishing]')"); await sleep(40)) {
+          if (!hit && await ev('window.__lastAnim') === 'fish_bite') { hit = true; await page.keyboard.down('Space'); } // the bite window is 1.3 s
+        }
+        if (hit) await page.keyboard.up('Space');
+        if (!await ev("!!document.querySelector('[data-testid=fishing]')")) { await drain(); continue; } // missed the bite: cast again
+        await shot('13_fishing_minigame');
+        // keep the zone on the fish: the same key events the keyboard produces, from a fast in-page loop (software rendering runs at ~4 fps)
+        await ev(`(() => { let holding = false, last = null; const k = (type) => window.dispatchEvent(new KeyboardEvent(type, { key: ' ' }));
+          window.__ctl = setInterval(() => { const z = document.querySelector('.lb-zone'), f = document.querySelector('.lb-fish'); if (!z || !f) return; const zr = z.getBoundingClientRect(), fr = f.getBoundingClientRect(); const zc = zr.top + zr.height / 2, fc = fr.top + fr.height / 2; const vel = last === null ? 0 : zc - last; last = zc; const want = zc + vel * 6 > fc; if (want && !holding) { holding = true; k('keydown'); } else if (!want && holding) { holding = false; k('keyup'); } }, 25); return 1; })()`);
+        for (let t0 = Date.now(); Date.now() - t0 < 120000 && await ev("!!document.querySelector('[data-testid=fishing]')"); await sleep(300));
+        await ev('(clearInterval(window.__ctl), window.dispatchEvent(new KeyboardEvent("keyup", { key: " " })))');
+        assert(await drain(), 'did not return to free roam after the minigame');
+        caught = await ev('window.__game.Game.state.stats.fishCaught');
+      }
+      assert(caught >= 1, 'no fish caught in 3 casts');
+      const log = await ev('Object.keys(window.__game.Game.state.log.fish).length');
+      assert(log >= 1, 'the catch is not in the fish log');
+      assert(await ev("window.__game.svc.quests.isDone('t_first_catch')"), "quest 't_first_catch' did not finish");
+      await shot('14_fishing_done');
+      return `${caught} fish, log ${log}`;
+    });
+
+    await step('lamps: with a repaired lamp at dusk, Space lights it', async () => {
+      await ev('window.__game.Game.state.story.lanterns = 1');
+      await ev('window.__game.LB.time(18)');
+      await gotoArea('town_square');
+      const lamps = await ev("window.__game.svc.entities.area().interactables.filter((i) => i.type === 'lamp').map((i) => i.id)");
+      let lit = null;
+      for (const id of lamps) {
+        try { await standAt(id); } catch (_) { continue; } // somebody standing in front of it
+        await press('Space');
+        await waitFor(`window.__game.svc.lamps.stateOf('town_square', '${id}', window.__game.svc.entities.area().interactables.find((i) => i.id === '${id}')) === 'lit'`, 20000);
+        lit = id;
+        break;
+      }
+      assert(lit, 'no lamp could be targeted and lit');
+      await waitFor("window.__game.Game.mode === 'field'", 15000);
+      return lit;
+    });
+
+    await step('heart event: Mira at 2 hearts plays out through Space and returns control', async () => {
+      await ev("(() => { const G = window.__game; G.LB.date(0, 2); G.LB.time(7, 30); G.LB.weather('sunny'); G.LB.hearts('mira', 2); return 1; })()");
+      await gotoArea('cafe');
+      ev("window.__game.LB.goto('bakery')").catch(() => {});
+      await waitFor("window.__game.Game.state.flags.seen_heart_mira_2 === true", 40000);
+      assert(await drain(120), 'the event never handed control back');
+      await sleep(1200);
+      assert(await ev("getComputedStyle(document.querySelector('.lb-fade')).opacity") === '0', 'a fade was left on screen');
+      assert(await ev("!document.querySelector('.lb-letterbox').classList.contains('on')"), 'letterbox left on');
+      assert(await ev('window.__game.Game.state.player.area') === 'bakery', 'not back in the bakery');
+    });
+
+    await step('reload: title Continue lists the save, the export dialog is usable, Load restores it', async () => {
+      await ev('window.__game.LB.money(4242)');
+      const r = await ev('window.__game.Systems.saveGame(2)');
+      assert(r && r.ok, 'save failed');
+      await page.reload({ waitUntil: 'load' });
+      await waitFor('window.__ready === true', 120000);
+      await waitFor("window.__game.Game.mode === 'title'", 30000);
+      await press('Space');
+      await waitFor("!!document.querySelector('[data-testid=title-continue]')", 8000);
+      await page.click('[data-testid=title-continue]');
+      await waitFor("!!document.querySelector('[data-testid=continue]')", 8000);
+      await page.click('[data-testid=cont-export-2]');
+      await waitFor("!!document.querySelector('[data-testid=export-text]') && document.querySelector('[data-testid=export-text]').value.length > 100", 5000);
+      await shot('15_export_dialog');
+      await page.click('[data-testid=export-close]', { timeout: 5000 }); // must not be hidden behind the title
+      await page.click('[data-testid=cont-load-2]');
+      await waitFor('window.__game.Game.mode === "field" && window.__game.Game.state.player.money === 4242', 40000);
     });
   } finally {
     log(errors.length === 0, 'no page errors / console errors', errors.slice(0, 3).join(' | '));

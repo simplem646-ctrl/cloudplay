@@ -196,6 +196,29 @@ test('interaction: an NPC in front wins; confirm offers Talk / Give a gift / Nev
   svc.rel.giftFlow = origG;
 });
 
+test('interaction: a person standing at a job counter (Theo at the post counter) still lets you work via the NPC menu', async () => {
+  const env = boot({ quickAnims: true });
+  await startIn('general_store', 'counter_front', { minutes: 13 * 60 + 20, day: 1 });
+  const theo = svc.entities.actor('theo');
+  assert.ok(theo, 'Theo works the post counter in the afternoon');
+  const pa = svc.entities.playerActor();
+  svc.entities.teleport(pa, theo.x, theo.z + 0.95, 'n');
+  pa.facing = 'n';
+  frames(0.8);
+  assert.equal(svc.interaction.target.kind, 'npc');
+  assert.equal(svc.interaction.target.counter?.id, 'post_counter');
+  const spy = spyRun();
+  const origT = svc.rel.talk;
+  svc.rel.talk = async () => {};
+  env.askQueue.push(2);
+  await press();
+  await wait(5);
+  assert.deepEqual(env.asks.at(-1).options.map((o) => o.text), ['Talk', 'Give a gift', 'Work', 'Never mind']);
+  assert.deepEqual(spy.calls, [['general_store', 'post_counter']]);
+  svc.rel.talk = origT;
+  spy.restore();
+});
+
 // ---------------------------------------------------------------- staging with the REAL events
 const pump = async (p, seconds = 90) => {
   let done = false;
@@ -530,6 +553,8 @@ test('job: bakery shift - window/closed checks, intro once, kneading pay, energy
   await svc.jobs.start('bakery_shift');
   assert.match(env.narrates.at(-1), /too tired/);
   Game.state.player.energy = 100;
+  delete Game.state.quests.active.t_first_shift; // the tutorial quest (auto-started) would add its own reward
+  Game.state.quests.done.t_first_shift = 1;
   const m0 = Game.state.player.money;
   const aff = [svc.rel.aff('mira'), svc.rel.aff('rosalind')];
   env.says.length = 0;

@@ -109,7 +109,7 @@ Lanternbrook keeps a calendar. Look for these and plan an evening around them:
 
 - **Blossom Picnic**, Spring 14
 - **Midsummer Lights**, Summer 21
-- **Harvest Moon Fair**, Autumn 14
+- **Autumn Moon Fair**, Autumn 14
 - **Hearthlight Evening**, Winter 10
 - **The Lantern Festival**, Winter 24
 

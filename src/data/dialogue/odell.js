@@ -22,7 +22,7 @@ export default {
       ['Hot, isn\'t it? I wear a waistcoat in every season. It is a matter of principle. And pockets.', 'happy'],
     ] },
     { id: 'odell_autumn', weight: 2, when: { season: 'autumn' }, lines: [
-      ['The Harvest Moon Fair! My favourite. I eat nine pies and tell everyone it was research.', 'laugh'],
+      ['The Autumn Moon Fair! My favourite. I eat nine pies and tell everyone it was research.', 'laugh'],
     ] },
     { id: 'odell_winter', weight: 2, when: { season: 'winter' }, lines: [
       ['Winter again. It does get chilly. And dark. The lanterns, they would have helped.', 'sad'],

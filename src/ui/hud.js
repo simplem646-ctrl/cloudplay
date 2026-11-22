@@ -189,5 +189,5 @@ export function fade(to, ms = 500, color = '#000') {
   });
 }
 
-export function letterbox(on) { el.letter.classList.toggle('on', !!on); }
+export function letterbox(on) { el.letter.classList.toggle('on', !!on); el.quest.classList.toggle('cine', !!on); }
 export { frag };

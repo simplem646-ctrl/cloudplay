@@ -1,0 +1,27 @@
+# Handoff: QA play-test pass — 4 real bugs fixed, e2e extended, festival renamed (2026-11-22)
+
+Audience: a future Claude session resuming the orchestrated game build. Sequel to `20261122_04_integration-main-and-artifact.md` (see `20261121_01_*` for request/design/decisions; `20261121_04_*` for the usage‑limit recovery recipe).
+**NO‑ASK RUN IN PROGRESS** (never call AskUserQuestion; log decisions; ends with the final report). User‑facing text in Indonesian. The user again reported (Indonesian) that their usage limit had been hit and reset — "continue".
+
+## What happened
+- **Usage limit hit a third time** (window 07:10–12:10 UTC; it ran out ≈ 08:55 UTC, right after T15 was dispatched, so ~3 h were lost). t15 died before leaving any edits; the new window began 12:10 UTC. t15 was resumed with SendMessage plus an instruction to keep `/tmp/orchestrate/t15/NOTES.md` after each item and to keep the tree green. **The artifact v1 had already been published** (https://claude.ai/artifact/JckDuu1gSS5WLBogdCvDY9).
+- **T15 QA + fix (`sonnet·high`, unisolated lone writer) finished.** Playwright against the production bundle, real keys for the action under test, state via `LB`. **4 real bugs fixed:** (1) **quests with an `unlock` condition never started** (3 tutorials, m4–m8, all side quests → Gus's starter rod never appeared) → `quests.autoStart()` from `poll()` (waits for `prologue_done`; side quests start when the giver is talked to); (2) an NPC standing on a counter/lamp/door interaction point shadowed the job/shop/lamp prompt → NPC menu gets an extra Work/Shop/Light lamp entry, `setTarget` keeps the fresh pick; (3) Export/Import dialogs opened on the title were drawn behind it → `.lb-scrim` z-index 20; (4) the quest chip showed over the letterbox → hidden while the letterbox is on. Files: `src/systems/{quests,interaction}.js`, `src/ui/{hud,styles}.js`, tests `sys-world`, `sys-s2-play`, `tests/e2e/smoke.cjs` (+6 steps: closed bakery door, gift, fishing with Gus's rod, lamp lighting, Mira 2♥ event, reload → Continue → export dialog → Load).
+- **QA coverage (all PASS or fixed):** fishing with real held Space (catch recorded, quest paid; no‑rod, missed bite, failed minigame); shops at real counters (bakery, general store, fishing hut, café, inn, clinic: buy/sell, closed hours/day); gift flow (loved/hated/already‑today); day loop (24:00 toast, 26:00 collapse, mail +100c, notice board errand delivered); jobs (kneading, parcel run to 5 NPCs, lamplighter + night glow); **20 heart events + confession (accept sets `*_dating`), all 5 festivals, journal_found, lantern events 1/3/6, 3 friend events, both endings — each ends in `field` mode with fade 0 and letterbox off**; 12 season×weather combos; all 7 menu tabs at 1280×720 and 844×390; persistence incl. page reload → Continue, export/import/delete, localStorage‑throws fallback; robustness (every door and edge of all 18 areas, rapid area changes, key spam in fades, resizes, hidden tab, q=medium/high).
+- **Lead:** renamed "Harvest Moon Fair" → **"Autumn Moon Fair"** everywhere (data, dialogue, mail, events, DESIGN.md, HOW_TO_PLAY.md) to stay clear of a well‑known series title (ids `harvest` / `festival_harvest` / `harvest_fair` unchanged). `npm test` **241/241**; `npm run build`, `build:artifact`, `check:artifact` OK; the full `e2e` (19 steps) was re‑running at commit time (T15's own runs: 19/19 twice).
+
+## Known issues (honest list)
+- A closed building's sign never states its opening time although HOW_TO_PLAY says it does (data text issue). Calendar birthday list wraps "Summer 17" and the name onto separate lines. Staged Juno 8♥ at the harbor may frame poorly. An NPC in front of a noticeboard/counter still wins the prompt (step aside, or use the NPC menu's new entry). Touch prompts still read "Space: …".
+- **Not verified:** audio has never been HEARD (only analysed offline / `Game.audio.stats()`); touch on a real device; real safe‑area insets; heart events were triggered by satisfying their conditions (not via a long natural playthrough); **the story has not been proven completable end to end** (are all quest items obtainable? does each main quest chain progress and pay out? does Winter 24 reach an ending?) — next task.
+- Software rendering ≈ 4 fps in the sandbox, so frame‑rate/feel on real hardware is untested (draw calls ≤ 252/area).
+
+## Decided without asking (additions)
+| Decision | Chosen | Why |
+|---|---|---|
+| Rename the autumn festival | "Autumn Moon Fair" | avoid evoking a known series title (user asked for no protected branding) |
+| Skip the opus review for now; instead run a story‑completability task | yes | the QA proved features, not that the story can be finished; usage is finite |
+
+## Git state
+Branch `claude/keen-bell-6isjol`, this commit = T15 fixes + rename + handoff, pushed. Artifact v1 is live; **v2 must be republished from the rebuilt `dist/artifact.html`** after this commit.
+
+## Open follow‑ups
+1. Republish the artifact (same `file_path` keeps the URL). 2. **T16 story completability** (`sonnet·high`, unisolated): static obtainability analysis of every quest item/goal + a Node simulation of the tutorial and the 9 main quests to the Winter 24 ending (+ short player walkthrough doc); fix blockers. 3. `playwright-cli` inspection of the final production bundle (the user asked for it; use the docker CDP browser at `http://172.17.0.1:<port>`, `./scripts/setup-env.sh` first). 4. Final honest report in Indonesian. Window ends ≈ 17:10 UTC.

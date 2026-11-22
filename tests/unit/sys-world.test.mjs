@@ -656,3 +656,35 @@ test('interact: job delegates to svc.jobs.start; lamp unhandled falls back to te
   assert.deepEqual(seen, [['brook_lane', 'lamp_bl_1', true]]);
   delete svc.interact.handlers.lamp;
 });
+
+test('quests: autoStart begins every quest whose unlock now holds (tutorial / main / side), never board quests or errands', async () => {
+  setup();
+  const q = svc.quests;
+  Game.data.quests.q_auto = { id: 'q_auto', kind: 'tutorial', title: 'Auto', desc: 'd', unlock: { flag: 'auto_go' }, stages: [{ id: 'a', text: 'a', goal: { type: 'flag', flag: 'never' } }], reward: {} };
+  Game.state.flags.auto_go = true;
+  q.poll();
+  await settle();
+  assert.equal(q.isActive('q_auto'), false, 'not before the prologue is done');
+  Game.state.flags.prologue_done = true;
+  delete Game.state.flags.auto_go;
+  q.poll();
+  await settle();
+  assert.equal(q.isActive('q_auto'), false, 'locked until its condition holds');
+  Game.state.flags.auto_go = true;
+  q.poll();
+  await settle();
+  assert.equal(q.isActive('q_auto'), true);
+  Game.state.flags.board_unlocked = true;
+  q.poll();
+  await settle();
+  assert.equal(q.isActive('q_board'), false, 'board quests wait on the notice board');
+  Game.data.quests.q_side = { id: 'q_side', kind: 'side', giver: 'mira', title: 'Side', desc: 'd', unlock: { flag: 'auto_go' }, stages: [{ id: 'a', text: 'a', goal: { type: 'flag', flag: 'never' } }], reward: {} };
+  q.poll();
+  await settle();
+  assert.equal(q.isActive('q_side'), false, 'side quests wait for a talk with their giver');
+  Game.bus.emit(EVT.NPC_TALK, { id: 'mira' });
+  await settle();
+  assert.equal(q.isActive('q_side'), true);
+  delete Game.data.quests.q_auto;
+  delete Game.data.quests.q_side;
+});

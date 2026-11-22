@@ -25,7 +25,7 @@ export default {
     },
   },
   harvest: {
-    id: 'harvest', name: 'Harvest Moon Fair', date: { season: 'autumn', day: 14 }, area: 'town_square', from: '10:00', to: '21:00',
+    id: 'harvest', name: 'Autumn Moon Fair', date: { season: 'autumn', day: 14 }, area: 'town_square', from: '10:00', to: '21:00',
     eventId: 'festival_harvest', decor: 'harvest_fair', closes: ['general_store', 'library'],
     placement: {
       default: { area: 'town_square', anchors: ['plaza_center', 'fountain_spot', 'noticeboard_spot', 'tree_shade', 'bench_sq_1_spot', 'bench_sq_2_spot', 'cafe_terrace_1', 'cafe_terrace_2'] },

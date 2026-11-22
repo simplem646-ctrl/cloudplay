@@ -39,7 +39,7 @@ const harvest = {
   script: [
     { setFlag: 'seen_festival_harvest' }, { decor: 'harvest_fair' },
     { narrate: 'Stalls ring the square, heaped with apples, pumpkins and pies. A gold moon hangs over the clock tower.' },
-    say('odell', 'The Harvest Moon Fair! Fishing contest at the pier, bake-off at the bakery steps and a reading at the stage!', 'happy'),
+    say('odell', 'The Autumn Moon Fair! Fishing contest at the pier, bake-off at the bakery steps and a reading at the stage!', 'happy'),
     say('juno', 'Fishing contest, you say? I have won three years running. You may enter. You will lose.', 'smug'),
     say('rosalind', 'The bake-off. Mira, hold the tray steady. No, steadier. {player}, hold your breath for her.', 'neutral'),
     { ask: [

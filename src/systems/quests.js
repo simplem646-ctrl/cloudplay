@@ -46,6 +46,9 @@ export const quests = {
       s.on(e, () => quests.poll());
     }
     s.on(EVT.AREA_ENTER, () => quests.poll());
+    s.on(EVT.NPC_TALK, ({ id }) => {
+      quests.autoStart(id);
+    });
     s.on(EVT.TIME_TICK, ({ minutes }) => {
       if (minutes % 10 === 0 && Game.mode === 'field') quests.poll();
     });
@@ -144,7 +147,20 @@ export const quests = {
   /** Re-check polled goals (have, hearts, flag, date, lanterns, visit-with-anchor, plus counters). */
   poll() {
     if (!Game.state) return;
+    quests.autoStart();
     for (const id of Object.keys(act())) enqueue(() => quests._evaluate(id));
+  },
+
+  /** Start every tutorial/main quest whose `unlock` condition now holds; a side quest starts when you talk to its giver
+   * (`talkedTo`). Board quests are offered on the notice board instead. */
+  autoStart(talkedTo = null) {
+    if (!Game.state || !getFlag('prologue_done')) return; // nothing auto-starts over the opening cutscene
+    for (const def of Object.values(D().quests || {})) {
+      if (!def?.unlock || def.board || def.kind === 'errand' || quests.isActive(def.id)) continue;
+      if (def.kind === 'side' && def.giver !== talkedTo) continue;
+      if (quests.isDone(def.id) && !def.repeat) continue;
+      if (svc.conditions.evalCond(def.unlock, { key: def.id })) quests.start(def.id);
+    }
   },
 
   goalMet(g, r) {

@@ -24,7 +24,7 @@ const BASE = `
 .lb-btn.danger{background:linear-gradient(180deg,#f58aa0,#e0607e);color:#fff;border-color:#a8405a}
 .lb-btn.is-disabled,.lb-btn:disabled{opacity:.5;filter:grayscale(.5);cursor:not-allowed}
 .lb-btn.small{padding:.15em .6em;min-height:1.6em;font-size:.88em}
-.lb-scrim{position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(40,24,18,.35),rgba(30,18,14,.62));display:flex;align-items:center;justify-content:center;pointer-events:auto;animation:lb-fadein .18s ease-out}
+.lb-scrim{position:absolute;inset:0;z-index:20;background:radial-gradient(ellipse at center,rgba(40,24,18,.35),rgba(30,18,14,.62));display:flex;align-items:center;justify-content:center;pointer-events:auto;animation:lb-fadein .18s ease-out}
 .lb-scrim.light{background:radial-gradient(ellipse at center,rgba(40,24,18,.15),rgba(30,18,14,.45))}
 .lb-pop{animation:lb-pop .26s cubic-bezier(.2,1.4,.4,1)}
 .lb-bump{animation:lb-bump .3s ease-out}
@@ -59,6 +59,7 @@ const HUD = `
 .lb-clock .lb-moon{width:1.1em;height:1.1em;opacity:0;transition:opacity .5s}
 .lb-clock .lb-moon.on{opacity:1}
 .lb-questline{position:absolute;left:.8em;top:5.6em;max-width:min(22em,44vw);padding:.3em .8em .3em .6em;background:rgba(255,244,220,.8);border:.14em solid rgba(138,90,58,.7);border-radius:.8em;font-size:.88em;display:flex;gap:.5em;align-items:center;box-shadow:0 .3em .6em rgba(50,30,20,.2)}
+.lb-questline.cine{visibility:hidden}
 .lb-questline svg{width:1.3em;height:1.3em;flex:none}
 .lb-questline b{display:block;font-size:.85em;color:var(--ink2);line-height:1.1}
 .lb-questline span{display:block;line-height:1.2}
