@@ -46,6 +46,16 @@ export default {
     { id: 'nana_friend', weight: 3, when: { hearts: { npc: 'nana_fen', gte: 3 } }, lines: [
       ["You're a good sort, {player}. I'd knit you a scarf, if you weren't already wearing an orange one.", 'smug'],
     ] },
+    { id: 'fen_knit_1', weight: 2, when: { time: { from: '10:00', to: '20:00' } }, lines: [
+      ['I am knitting a scarf for a person who has not yet been introduced. Do not look so innocent. It is yours.', 'smug'],
+    ] },
+    { id: 'fen_tea_2', weight: 2, when: { weather: ['rain', 'storm', 'snow'] }, lines: [
+      ['There is a seat by the fire with your name on it. Not literally, dear. Tobias carved his instead of a name. A tiny lamp.', 'happy'],
+    ] },
+    { id: 'fen_tobias_3', weight: 3, when: { lanterns: { gte: 4 } }, lines: [
+      ['You are nearly there, you know. The town can feel it. Even the old pipes in the inn have started to hum.', 'happy'],
+      ['Do come and sit afterwards. I shall want to hear every word.', 'smug'],
+    ] },
   ],
   gifts: {
     love: [

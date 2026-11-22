@@ -40,6 +40,18 @@ export default {
     { id: 'odell_friend', weight: 3, when: { hearts: { npc: 'odell', gte: 4 } }, lines: [
       ["You remind me of Tobias a little, {player}. Not the beard. The hands. He always helped with his hands.", 'happy'],
     ] },
+    { id: 'odell_pun_1', weight: 2, when: { time: { from: '09:00', to: '16:00' } }, lines: [
+      ['I tried to write a letter about the lamp budget. It was a very long story. Lamp-ly written, you might say.', 'laugh'],
+      ['Ahem. I will see myself out of my own office.', 'happy'],
+    ] },
+    { id: 'odell_tobias_2', weight: 3, when: { lanterns: { gte: 2 } }, lines: [
+      ['Tobias used to leave a lamp-key on my desk every winter. Never a note. Just the key, and a smile in the dust.', 'sad'],
+      ['I am glad it is in good hands again.', 'happy'],
+    ] },
+    { id: 'odell_fest_3', weight: 3, when: { lanterns: { gte: 5 } }, lines: [
+      ['The festival is close. I have practised my speech in the bath. The bath was very moved.', 'laugh'],
+      ['Do not tell the town I wept at the rehearsal. It was a pun. The pun was beautiful.', 'happy'],
+    ] },
   ],
   gifts: {
     love: [

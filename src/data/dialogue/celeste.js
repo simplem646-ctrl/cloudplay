@@ -49,6 +49,31 @@ export default {
     { id: 'celeste_close', weight: 3, when: { hearts: { npc: 'celeste', gte: 6 } }, lines: [
       ['I wait for my mentor, you know. Every night. But lately I also wait for you.', 'shy'],
     ] },
+    { id: 'celeste_new_1', weight: 2, when: { hearts: { npc: 'celeste', gte: 0, lte: 1 } }, lines: [
+      ['Oh, hello. Is it Tuesday? It might be Thursday. I have not checked the sky for the day lately.', 'thinking'],
+    ] },
+    { id: 'celeste_new_2', weight: 2, when: { hearts: { npc: 'celeste', gte: 0, lte: 2 } }, lines: [
+      ["I forgot lunch again. Twice. Today I wrote myself a note: 'Eat.' I then forgot the note. It is on the telescope.", 'shy'],
+    ] },
+    { id: 'celeste_cloud_3', weight: 2, when: { weather: ['rain', 'storm'] }, lines: [
+      ['Rain makes the sky wear a blanket. The stars are still there. They are only pretending not to be.', 'happy'],
+      ['I am cataloguing the clouds instead. This one is called Gentle Sarcasm.', 'laugh'],
+    ] },
+    { id: 'celeste_friend_4', weight: 2, when: { hearts: { npc: 'celeste', gte: 3, lte: 6 } }, lines: [
+      ["I counted forty-one lamps on my walk. I knew each one's name by the end. Is that normal? It feels normal.", 'happy'],
+    ] },
+    { id: 'celeste_vane_5', weight: 3, when: { hearts: { npc: 'celeste', gte: 5, lte: 8 } }, lines: [
+      ['I wrote another letter to Aldous. I did not send it. Letters feel braver when they live in a drawer.', 'sad'],
+      ['But you made me want to post it. Perhaps tomorrow.', 'shy'],
+    ] },
+    { id: 'celeste_winter_6', weight: 2, when: { season: 'winter' }, lines: [
+      ['The winter sky is a crisp, clean sheet of paper. Every star is a freshly sharpened pencil point.', 'happy'],
+      ['Mind the cold. I forgot my gloves again. I have two spare pairs. Somewhere. In the sky.', 'laugh'],
+    ] },
+    { id: 'celeste_dating_7', weight: 3, when: { flag: 'celeste_dating' }, lines: [
+      ['I found a new star! Then it moved. It was a firefly in the lens. I have named it anyway. Its name is Hope.', 'laugh'],
+      ['Come sit. I saved you the warm half of the blanket.', 'shy'],
+    ] },
   ],
   gifts: {
     love: [

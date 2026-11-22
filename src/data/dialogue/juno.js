@@ -49,6 +49,31 @@ export default {
     { id: 'juno_close', weight: 3, when: { hearts: { npc: 'juno', gte: 6 } }, lines: [
       ["I'm... glad you came by today. I don't say that. So say thanks and let's go fish.", 'shy'],
     ] },
+    { id: 'juno_new_1', weight: 2, when: { hearts: { npc: 'juno', gte: 0, lte: 1 } }, lines: [
+      ['You look lost. Rule one of the harbor: walk like you know where you are going. Rule two: you are lost.', 'smug'],
+    ] },
+    { id: 'juno_new_2', weight: 2, when: { hearts: { npc: 'juno', gte: 0, lte: 2 } }, lines: [
+      ['I caught a boot last week. A boot! Gramps says it is a lucky boot. It is a very smelly lucky boot.', 'laugh'],
+    ] },
+    { id: 'juno_knots_3', weight: 2, when: { hearts: { npc: 'juno', gte: 2, lte: 5 } }, lines: [
+      ['Want to learn a bowline? It is the knot that does not let go. I am very good at it. Very.', 'smug'],
+      ['I tied my own shoes with it once. Took twenty minutes to get out.', 'laugh'],
+    ] },
+    { id: 'juno_gramps_4', weight: 2, when: { hearts: { npc: 'juno', gte: 4, lte: 7 } }, lines: [
+      ['Gramps told the whale story three times this week. Every time the whale gets bigger. Soon it will be the harbor.', 'laugh'],
+      ['I love it. Do not tell him I said that. He will make it a leviathan.', 'shy'],
+    ] },
+    { id: 'juno_night_5', weight: 2, when: { night: true }, lines: [
+      ['Lighthouse is humming tonight. You can hear it from the pier if you stand still. I stood still. For almost a minute!', 'happy'],
+    ] },
+    { id: 'juno_storm_6', weight: 3, when: { weather: 'storm' }, lines: [
+      ['Storm night. Everything is tied twice. That is the rule since you showed me how to listen.', 'smug'],
+      ['I hate how right you were about the knot. I hate it a lot. Come inside, I will make tea.', 'shy'],
+    ] },
+    { id: 'juno_dating_7', weight: 3, when: { flag: 'juno_dating' }, lines: [
+      ['You beat me to the pier this morning. I will let that count as a love language.', 'smug'],
+      ['Tomorrow I win. Tomorrow I always win. That is the other love language.', 'laugh'],
+    ] },
   ],
   gifts: {
     love: [

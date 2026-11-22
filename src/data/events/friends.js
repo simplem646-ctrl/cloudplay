@@ -65,7 +65,7 @@ export default Object.fromEntries([
     ['player', 'Squids do not wink.'],
     ['gus', 'This one did! ...Fine. It was a very large boot. But it was a winking boot.', 'laugh'],
   ] }),
-  F('gus', 2, 6, { needPrev: true, area: 'harbor', at: 'lighthouse_base', npcAt: 'sunset_spot', when: [{ time: { from: '16:00', to: '20:00' } }], steps: [
+  F('gus', 2, 6, { needPrev: true, area: 'harbor', at: 'lighthouse_base', npcAt: { x: 37.6, z: 20.2 }, when: [{ time: { from: '16:00', to: '20:00' } }], steps: [
     ['gus', 'That is the old girl. Dark as a coal sack. I sailed in under her light every night for thirty years.', 'sad'],
     ['gus', 'My wife used to wait here. Waved a lantern. She is gone now. The light went out about the same time.', 'sad'],
     ['player', 'We will light it again.'],

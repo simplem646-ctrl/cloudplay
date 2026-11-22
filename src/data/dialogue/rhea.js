@@ -49,6 +49,31 @@ export default {
     { id: 'rhea_close', weight: 3, when: { hearts: { npc: 'rhea', gte: 6 } }, lines: [
       ['Some days I wonder if I belong here. Then you walk in, and it feels... settled.', 'shy'],
     ] },
+    { id: 'rhea_new_1', weight: 2, when: { hearts: { npc: 'rhea', gte: 0, lte: 1 } }, lines: [
+      ['Welcome. Sit. Order something. Not the first thing you see on the board. I was in a mood when I wrote it.', 'smug'],
+    ] },
+    { id: 'rhea_new_2', weight: 2, when: { hearts: { npc: 'rhea', gte: 0, lte: 2 } }, lines: [
+      ['A good cup has three notes. Most people only taste one. The third is the one that stays with you.', 'thinking'],
+      ['Yes, I realise that sounds pretentious. It is also true.', 'smug'],
+    ] },
+    { id: 'rhea_pastry_3', weight: 2, when: { hearts: { npc: 'rhea', gte: 2, lte: 5 } }, lines: [
+      ['Mira sends over a tray of rolls each morning. I told her not to. I ate two before opening. She will never know.', 'smug'],
+    ] },
+    { id: 'rhea_cold_4', weight: 2, when: { weather: ['snow', 'rain'] }, lines: [
+      ['A day like this is for stews and quiet people. You qualify on at least one count.', 'smug'],
+      ['Sit by the radiator. It is the only warm thing in the room that does not give opinions.', 'neutral'],
+    ] },
+    { id: 'rhea_old_5', weight: 2, when: { hearts: { npc: 'rhea', gte: 4, lte: 7 } }, lines: [
+      ['Odd. I used to count the hours until I could leave a kitchen. Here I count them until the kettle sings.', 'thinking'],
+      ['Do not make it a thing. It is only a kettle.', 'shy'],
+    ] },
+    { id: 'rhea_pink_6', weight: 2, when: { hearts: { npc: 'rhea', gte: 3, lte: 6 } }, lines: [
+      ['Somebody put pink flowers on my tables. I did not remove them. Do not say it was Theo. I have not decided yet.', 'smug'],
+    ] },
+    { id: 'rhea_dating_7', weight: 3, when: { flag: 'rhea_dating' }, lines: [
+      ['You are early. Perfect. I have just tried a new spice. If it is terrible, you may lie. Gently.', 'happy'],
+      ['Sit. The usual seat is warm. I may have breathed on it.', 'shy'],
+    ] },
   ],
   gifts: {
     love: [

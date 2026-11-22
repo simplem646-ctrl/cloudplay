@@ -45,7 +45,9 @@ export default {
     net_rack: [14.8, 13.9, 'n'],
     harbor_bench_spot: [30.4, 16.4, 's'],
     sunset_spot: [8.0, 17.4, 's'],
-    lighthouse_base: [41.4, 23.9, 'n'],
+    // just west of the tower: the follow camera cannot centre on the rocky point at the far east end, so anything standing on
+    // it (the old anchor at 41.4, 23.9) fell outside the frame; this spot is always on screen
+    lighthouse_base: [38.4, 21.3, 'e'],
     crates: [17.6, 16.8, 'n'],
   },
   critters: [

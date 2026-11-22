@@ -60,6 +60,35 @@ export default {
       ["I've been thinking about... my own little bakery. Don't laugh. Please don't laugh.", 'shy'],
       ['Sometimes I think it is silly to dream. But when you smile, it feels less silly.', 'shy'],
     ] },
+    { id: 'mira_new_1', weight: 2, when: { hearts: { npc: 'mira', gte: 0, lte: 1 } }, lines: [
+      ["Oh! You are the one who lives in Tobias' cottage! Do you like cinnamon? Please like cinnamon!", 'happy'],
+      ['Sorry, I ask everybody that. It is how I decide who gets the second bun.', 'laugh'],
+    ] },
+    { id: 'mira_new_2', weight: 2, when: { hearts: { npc: 'mira', gte: 0, lte: 2 } }, lines: [
+      ['If I look flustered, it is the oven. If I look flour-y, it is also the oven. It is a very busy oven.', 'laugh'],
+    ] },
+    { id: 'mira_flour_3', weight: 2, when: { hearts: { npc: 'mira', gte: 2, lte: 5 } }, lines: [
+      ['I found flour in my shoe today. My shoe! I was not even baking in it!', 'surprised'],
+      ['Mum says it is a sign of dedication. I say it is a sign of a hole in my apron.', 'laugh'],
+    ] },
+    { id: 'mira_rye_4', weight: 2, when: { hearts: { npc: 'mira', gte: 4, lte: 6 } }, lines: [
+      ['Mum let me shape the Saturday rye by myself! It looks like a very round hedgehog. She said it was adequate!', 'happy'],
+      ['I am going to frame that word. Do not tell her.', 'shy'],
+    ] },
+    { id: 'mira_notebook_5', weight: 2, when: { hearts: { npc: 'mira', gte: 4, lte: 7 } }, lines: [
+      ["I added a new page to my notebook. It says, 'Window with geraniums.' And, 'Ask {player} about a good bench.'", 'shy'],
+    ] },
+    { id: 'mira_frost_6', weight: 2, when: { season: 'winter' }, lines: [
+      ['Frost on the window, rolls in the oven, a friend in the doorway. This is my favourite kind of Tuesday.', 'happy'],
+      ['Even if it is not a Tuesday. It is a Tuesday-feeling!', 'laugh'],
+    ] },
+    { id: 'mira_dating_7', weight: 3, when: { flag: 'mira_dating' }, lines: [
+      ['You came by! I was just thinking about you. Also about yeast. But mostly you.', 'shy'],
+      ['Mum has been humming. She says she is not. She is. It is a bit flat.', 'laugh'],
+    ] },
+    { id: 'mira_dating_8', weight: 3, when: { all: [{ flag: 'mira_dating' }, { time: { from: '17:00', to: '21:00' } }] }, lines: [
+      ['Walk with me to the park? I will trip on the same stone and you can catch me. That is the plan.', 'happy'],
+    ] },
   ],
   gifts: {
     love: [

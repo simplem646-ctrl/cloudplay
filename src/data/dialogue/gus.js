@@ -45,6 +45,16 @@ export default {
     { id: 'gus_friend', weight: 3, when: { hearts: { npc: 'gus', gte: 3 } }, lines: [
       ["You're a good lad, {player}. Almost as good as my granddaughter. Don't tell her.", 'happy'],
     ] },
+    { id: 'gus_whale_1', weight: 2, when: { time: { from: '08:00', to: '18:00' } }, lines: [
+      ['The whale was the size of a barn. Last week I said a shed. Today I say a cathedral. The truth is a flexible beast.', 'laugh'],
+    ] },
+    { id: 'gus_juno_2', weight: 3, when: { lanterns: { gte: 3 } }, lines: [
+      ['Juno climbed the lighthouse steps today. Two at a time. I did not tell her I counted. Proud as a gull with a chip.', 'happy'],
+      ['Do not tell her. She will start taking three at a time. My knees cannot keep up.', 'worried'],
+    ] },
+    { id: 'gus_fog_3', weight: 2, when: { weather: ['rain', 'storm'] }, lines: [
+      ['Rain on a tin roof is the best music the sea ever gave a man. Better than any fiddle. Louder, too.', 'happy'],
+    ] },
   ],
   gifts: {
     love: [

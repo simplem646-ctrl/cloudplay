@@ -53,6 +53,33 @@ export default {
       ["There's a story I've been writing… I might let you read it. Someday. Not today. Maybe.", 'shy'],
       ['Sometimes I think the right word is hiding. When you\'re near, it usually shows up.', 'happy'],
     ] },
+    { id: 'willa_new_1', weight: 2, when: { hearts: { npc: 'willa', gte: 0, lte: 2 } }, lines: [
+      ['Oh. A visitor. I mean, hello. I was only talking to the shelf. It has strong opinions on alphabetical order.', 'shy'],
+    ] },
+    { id: 'willa_new_2', weight: 2, when: { hearts: { npc: 'willa', gte: 0, lte: 3 } }, lines: [
+      ['Please do not tell me which book you are reading. Let me guess. I will be wrong. I always am.', 'thinking'],
+      ['…No. Actually, I am rarely wrong. That is a bit embarrassing.', 'shy'],
+    ] },
+    { id: 'willa_margin_3', weight: 2, when: { hearts: { npc: 'willa', gte: 3, lte: 6 } }, lines: [
+      ['Somebody has been leaving pencil notes in the margins. Politely. I find them… quite enjoyable.', 'shy'],
+      ['I do not mind. Not at all. I may have written a reply. In very faint pencil.', 'thinking'],
+    ] },
+    { id: 'willa_lamp_4', weight: 3, when: { flag: 'lantern_2' }, lines: [
+      ['The lamps outside the library keep my pages warm after closing. I read three chapters by them last night.', 'happy'],
+      ['It is the first time a street has helped me finish a book.', 'shy'],
+    ] },
+    { id: 'willa_snow_5', weight: 2, when: { weather: 'snow' }, lines: [
+      ['Snow on the windowpane makes the library very quiet. Even the dust is thinking.', 'thinking'],
+      ['I put the kettle on. Stay a while. The books will not mind. They are used to waiting.', 'happy'],
+    ] },
+    { id: 'willa_close_6', weight: 3, when: { hearts: { npc: 'willa', gte: 5, lte: 7 } }, lines: [
+      ['I have started a new notebook. The first line is a dedication. I have crossed it out four times.', 'shy'],
+      ['It still says your name. Under the cross-outs. Do not look.', 'worried'],
+    ] },
+    { id: 'willa_dating_7', weight: 3, when: { flag: 'willa_dating' }, lines: [
+      ['I saved you the seat by the nook. I even put a cushion on it. Do not tell the cushion I said so.', 'happy'],
+      ['Today is rainy. Perfect. We may breathe moderately.', 'laugh'],
+    ] },
   ],
   gifts: {
     love: [

@@ -48,6 +48,17 @@ export default {
     { id: 'theo_close', weight: 3, when: { hearts: { npc: 'theo', gte: 6 } }, lines: [
       ["I'm late for everything, except you. Isn't that odd? I'm always on time for you!", 'happy'],
     ] },
+    { id: 'theo_news_1', weight: 2, when: { time: { from: '08:00', to: '17:00' } }, lines: [
+      ['Breaking news! Barnaby ordered a hundred spools of ribbon. Nobody knows why! Not even Barnaby!', 'happy'],
+      ['I am investigating. I will report back. Probably at length.', 'laugh'],
+    ] },
+    { id: 'theo_late_2', weight: 2, when: { time: { from: '17:00', to: '22:00' } }, lines: [
+      ['I have delivered forty-three letters today. And one very confused goose. The goose was addressed to nobody.', 'laugh'],
+    ] },
+    { id: 'theo_friend_3', weight: 3, when: { hearts: { npc: 'theo', gte: 5 } }, lines: [
+      ['You know, I never had a best friend who stayed. Everyone leaves for the city. You just... fixed a bike and stayed.', 'shy'],
+      ['Okay, I got emotional. Race you to the postbox!', 'laugh'],
+    ] },
   ],
   gifts: {
     love: [

@@ -18,6 +18,17 @@ export default {
     { id: 'ros_sunday', weight: 3, when: { weekday: 'sun' }, lines: ['Sunday, so the bakery is closed. I do not know what to do with my hands. They are not used to it.'] },
     { id: 'ros_friend', weight: 3, when: { hearts: { npc: 'rosalind', gte: 3 } }, lines: ['You work hard, {player}. Here, take a roll. No, I am not giving you a discount. A roll.', 'My daughter likes you. I do not say that lightly. She likes everyone, but you she respects.'] },
     { id: 'ros_tobias', weight: 3, when: { flag: 'journal_found' }, lines: ['He left a lantern on my step every dawn. I never told him how much that meant.'] },
+    { id: 'rosalind_early_1', weight: 2, when: { time: { from: '06:00', to: '09:00' } }, lines: [
+      ['You are up early. Good. Bread does not rise for the lazy. Nor does a mayor, but that is another matter.', 'neutral'],
+    ] },
+    { id: 'rosalind_mira_2', weight: 3, when: { hearts: { npc: 'rosalind', gte: 3 } }, lines: [
+      ["My daughter says I do not praise her. I praise her. I say 'adequate'. It is my highest word.", 'neutral'],
+      ['I only wish she would stop falling in the flour. It is such a waste of flour.', 'happy'],
+    ] },
+    { id: 'rosalind_tobias_3', weight: 3, when: { lanterns: { gte: 1 } }, lines: [
+      ['Tobias used to tap my window before dawn when the first loaf was ready. I miss the tap more than I admit.', 'sad'],
+      ['Do not look at me like that. Eat your roll.', 'neutral'],
+    ] },
   ],
   gifts: {
     love: ["Oh... oh, that is lovely. Thank you, {player}. I'll make something special with this.", 'This is... too much. Thank you. Truly.'],
