@@ -7,12 +7,30 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- BUILD:STYLE:START -->
 <style>
   html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #000; }
   body { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; font-family: Nunito, system-ui, sans-serif; }
   #game-canvas { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; background: #000; outline: none; touch-action: none; }
-  #ui-root { position: fixed; inset: 0; overflow: hidden; touch-action: none; user-select: none; }
+  #ui-root { position: fixed; inset: 0; overflow: hidden; touch-action: none; user-select: none;
+    padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px); }
+  /* Loading screen: pure HTML/CSS so it is on screen before the bundle runs; main.js fills the bar and fades it out. */
+  #boot-loading { position: fixed; inset: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+    background: radial-gradient(ellipse at 50% 42%, #3b2f52 0%, #1d1830 62%, #120f1f 100%); color: #ffe9b8; text-align: center;
+    font-family: Fredoka, Nunito, system-ui, sans-serif; transition: opacity .6s ease; }
+  #boot-loading.bl-out { opacity: 0; pointer-events: none; }
+  #boot-loading .bl-lamp { width: 72px; height: 104px; animation: bl-sway 3.2s ease-in-out infinite; transform-origin: 50% 0; }
+  #boot-loading .bl-glow { animation: bl-flick 1.6s ease-in-out infinite; transform-origin: 50% 60%; }
+  #boot-loading .bl-title { font-size: clamp(26px, 6vw, 44px); font-weight: 600; letter-spacing: .02em; color: #fff1cf; }
+  #boot-loading .bl-msg { font-size: clamp(14px, 2.6vw, 18px); opacity: .85; }
+  #boot-loading .bl-bar { width: min(280px, 64vw); height: 8px; border-radius: 8px; background: rgba(255, 233, 184, .16); overflow: hidden; }
+  #boot-loading .bl-bar i { display: block; width: 100%; height: 100%; border-radius: 8px; background: linear-gradient(90deg, #f4a93a, #ffd66b);
+    transform-origin: 0 50%; transform: scaleX(.06); transition: transform .35s ease; }
+  @keyframes bl-flick { 0%, 100% { opacity: .75; transform: scale(.94); } 45% { opacity: 1; transform: scale(1.05); } 70% { opacity: .85; transform: scale(1); } }
+  @keyframes bl-sway { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+  @media (prefers-reduced-motion: reduce) { #boot-loading .bl-lamp, #boot-loading .bl-glow { animation: none; } }
 </style>
+<!-- BUILD:STYLE:END -->
 <!-- BUILD:IMPORTMAP:START -->
 <script type="importmap">
 { "imports": { "three": "/node_modules/three/build/three.module.js", "three/addons/": "/node_modules/three/examples/jsm/" } }
@@ -20,8 +38,24 @@
 <!-- BUILD:IMPORTMAP:END -->
 </head>
 <body>
+<!-- BUILD:BODY:START -->
 <canvas id="game-canvas" tabindex="0"></canvas>
 <div id="ui-root"></div>
+<div id="boot-loading" role="status" aria-live="polite">
+  <svg class="bl-lamp" viewBox="0 0 72 104" aria-hidden="true">
+    <path d="M36 2v14" stroke="#c79a6b" stroke-width="4" stroke-linecap="round" fill="none"/>
+    <ellipse class="bl-glow" cx="36" cy="58" rx="34" ry="36" fill="#ffc861" opacity=".28"/>
+    <path d="M22 18h28l6 8H16z" fill="#8a5a3a"/>
+    <rect x="18" y="26" width="36" height="52" rx="12" fill="#ffd98a" stroke="#8a5a3a" stroke-width="4"/>
+    <ellipse class="bl-glow" cx="36" cy="54" rx="9" ry="14" fill="#fff6d6"/>
+    <path d="M24 78h24l-3 10H27z" fill="#8a5a3a"/>
+  </svg>
+  <div class="bl-title">Lanternbrook Days</div>
+  <div class="bl-msg">Lighting the lanterns…</div>
+  <div class="bl-bar"><i id="boot-bar"></i></div>
+  <noscript><div class="bl-msg">This game needs JavaScript.</div></noscript>
+</div>
+<!-- BUILD:BODY:END -->
 <!-- BUILD:SCRIPT:START -->
 <script type="module" src="/src/main.js"></script>
 <!-- BUILD:SCRIPT:END -->

@@ -47,7 +47,7 @@ const BASE = `
 `;
 
 const HUD = `
-.lb-hud{position:absolute;inset:0;pointer-events:none;transition:opacity .25s}
+.lb-hud{position:absolute;top:env(safe-area-inset-top,0px);right:env(safe-area-inset-right,0px);bottom:env(safe-area-inset-bottom,0px);left:env(safe-area-inset-left,0px);pointer-events:none;transition:opacity .25s}
 .lb-hud.is-hidden{opacity:0}
 .lb-clock{position:absolute;left:.8em;top:.8em;display:flex;align-items:center;gap:.6em;padding:.45em .9em .45em .55em;background:rgba(255,244,220,.88);border-radius:1em;min-width:11em}
 .lb-clock .lb-emblem{width:2.7em;height:2.7em;flex:none}
@@ -92,6 +92,8 @@ const HUD = `
 .lb-banner .lb-bs{margin-top:.2em;font-weight:800;font-size:1.3em;color:#ffe9a8;text-shadow:0 .08em .2em rgba(0,0,0,.6);letter-spacing:.1em;text-transform:uppercase}
 @keyframes lb-banner{0%{opacity:0;transform:translateY(-1em) scale(.9)}14%{opacity:1;transform:none}82%{opacity:1}100%{opacity:0;transform:translateY(.6em)}}
 .lb-fade{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none;z-index:50}
+/* the day summary, narration and dialogue are shown over a faded-to-black screen (sleep, collapse, cutscene fades) */
+.lb-layer,.lb-dlg,.lb-narrate{z-index:60}
 .lb-fade.block{pointer-events:auto}
 .lb-letterbox i{position:absolute;left:0;right:0;height:11%;background:#120c0c;transition:transform .6s ease-in-out;z-index:40}
 .lb-letterbox i:first-child{top:0;transform:translateY(-101%)}

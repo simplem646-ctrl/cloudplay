@@ -55,6 +55,15 @@ function makeSky() {
 }
 
 /** ---------------------------------------------------------------- init */
+/** Let the browser paint (next animation frame, or 50 ms at the latest when frames are throttled). */
+function paintFrame() {
+  return new Promise((resolve) => {
+    if (typeof requestAnimationFrame !== 'function') { setTimeout(resolve, 0); return; }
+    requestAnimationFrame(() => resolve());
+    setTimeout(resolve, 50);
+  });
+}
+
 export async function init({ canvas, quality = 'medium', seed = 1, onProgress } = {}) {
   W.canvas = canvas;
   W.quality = ['low', 'medium', 'high'].includes(quality) ? quality : 'medium';
@@ -72,9 +81,19 @@ export async function init({ canvas, quality = 'medium', seed = 1, onProgress } 
 
   W.scene = new THREE.Scene();
   W.tex = createTextureLibrary(W.quality === 'low' ? 0.5 : W.quality === 'high' ? 1.5 : 1);
-  for (const n of W.tex.names) W.tex.get(n);
-  for (const t of Object.values({})) void t;
+  // Texture generation is the slow part of boot: time-slice it so the loading screen keeps painting and its bar moves.
+  let sliceStart = performance.now();
+  const names = W.tex.names;
+  for (let i = 0; i < names.length; i++) {
+    W.tex.get(names[i]);
+    if (performance.now() - sliceStart > 30) {
+      onProgress && onProgress(0.1 + 0.3 * ((i + 1) / names.length));
+      await paintFrame();
+      sliceStart = performance.now();
+    }
+  }
   onProgress && onProgress(0.4);
+  await paintFrame();
   const m = createMaterials(W.tex);
   W.mats = m.mats; W.meta = m.meta; W.applySeasonMats = m.applySeason;
   W.water = createWaterMaterial(W.tex);
@@ -127,6 +146,7 @@ export async function init({ canvas, quality = 'medium', seed = 1, onProgress } 
   }
   resize(canvas.clientWidth || 1280, canvas.clientHeight || 720);
   onProgress && onProgress(0.7);
+  await paintFrame();
 
   const dbg = installDebug();
   if (dbg) {

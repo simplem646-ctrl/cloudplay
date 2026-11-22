@@ -23,6 +23,7 @@ let ticker = null, ambTicker = null;
 const beds = {};              // id -> { bed, st, level }
 let ambTarget = {};
 let wantedTrack = null;
+let ambOpts = null;
 const lastSfx = {};
 
 /** Master chain + buses; shared by the live context and offline renders. */
@@ -45,25 +46,46 @@ function trackChain(c, g, tr) {
   return { tg, send };
 }
 
+const GESTURES = ['pointerdown', 'keydown', 'touchend'];
+let gestured = false, armed = false;
+/** Re-apply what was requested before the context existed (music + ambience), once the context runs. */
+function applyWanted() {
+  if (!ctx || ctx.state !== 'running') return;
+  if (wantedTrack && !current) playMusic(wantedTrack.id, wantedTrack.opts);
+  if (ambOpts) setAmbience(ambOpts);
+}
+function onGesture() {
+  if (gestured) return;
+  gestured = true;
+  for (const e of GESTURES) document.removeEventListener(e, onGesture, true);
+  unlock();
+}
+/**
+ * Browsers only allow an AudioContext after a user gesture, so before the first key/pointer nothing is created (no console
+ * noise): init() arms a one-shot gesture listener and reports 'locked'. Music/ambience requested meanwhile start on unlock.
+ */
 export function init() {
   if (ctx || state === 'unavailable') return state;
   const AC = typeof globalThis !== 'undefined' && (globalThis.AudioContext || globalThis.webkitAudioContext);
   if (!AC) { state = 'unavailable'; return state; }
+  if (!gestured) {
+    state = 'locked';
+    if (!armed && typeof document !== 'undefined') { armed = true; for (const e of GESTURES) document.addEventListener(e, onGesture, true); }
+    return state;
+  }
   try {
     ctx = new AC({ latencyHint: 'interactive' });
     G = buildGraph(ctx);
     state = ctx.state;
-    ctx.onstatechange = () => { state = ctx.state; if (state === 'running' && wantedTrack && !current) playMusic(wantedTrack.id, wantedTrack.opts); };
-    if (typeof document !== 'undefined') {
-      const un = () => { unlock(); if (ctx && ctx.state === 'running') for (const e of ['pointerdown', 'keydown', 'touchend']) document.removeEventListener(e, un, true); };
-      for (const e of ['pointerdown', 'keydown', 'touchend']) document.addEventListener(e, un, true);
-    }
+    ctx.onstatechange = () => { state = ctx.state; applyWanted(); };
     ticker = setInterval(tick, 25);
     ambTicker = setInterval(ambTick, 250);
+    applyWanted();
   } catch (e) { ctx = null; G = null; state = 'unavailable'; }
   return state;
 }
 export function unlock() {
+  gestured = true;
   init();
   if (ctx && ctx.state === 'suspended') { try { const p = ctx.resume(); if (p && p.catch) p.catch(() => {}); } catch (e) { /* ignore */ } }
   if (ctx) state = ctx.state;
@@ -138,6 +160,7 @@ export function footstep(surface, { run = false } = {}) {
 
 export function setAmbience(o = {}) {
   ambTarget = ambienceMix(o);
+  ambOpts = o;
   init();
   if (!ctx) return ambTarget;
   const now = ctx.currentTime;

@@ -92,7 +92,8 @@ function refresh(force) {
   // quest line
   const qs = questList();
   const active = (s.quests && s.quests.active) || {};
-  let id = tracked && active[tracked] ? tracked : Object.keys(active)[0];
+  const want = (s.quests && s.quests.tracked) || tracked;
+  let id = want && active[want] ? want : Object.keys(active)[0];
   const sig = id ? id + ':' + (active[id] && active[id].stage) : '';
   if (force || last.q !== sig) {
     last.q = sig;

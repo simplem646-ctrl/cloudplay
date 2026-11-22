@@ -287,3 +287,16 @@ test('Sys.init + update are safe with no world at all (pure S1 environment)', ()
   Sys.init();
   assert.doesNotThrow(() => frames(0.2));
 });
+
+test('festival crowd: guests sharing an anchor get stable, separate spots (no overlapping NPCs)', async () => {
+  boot();
+  await startIn('town_square', 'plaza_center', { season: 3, day: 24, minutes: 18 * 60 });
+  const npcs = [...svc.entities.actors().values()].filter((a) => !a.isPlayer);
+  assert.ok(npcs.length >= 12, `expected a crowd, got ${npcs.length}`);
+  let min = Infinity;
+  for (let i = 0; i < npcs.length; i++) for (let j = i + 1; j < npcs.length; j++) min = Math.min(min, Math.hypot(npcs[i].x - npcs[j].x, npcs[i].z - npcs[j].z));
+  assert.ok(min >= 0.45, `two guests stand ${min.toFixed(2)} apart`);
+  const a = svc.npcs._point(svc.npcs.whereIs('pip', 18 * 60), null, true);
+  const b = svc.npcs._point(svc.npcs.whereIs('pip', 18 * 60), null, true);
+  assert.deepEqual([a.x, a.z], [b.x, b.z], 'a guest\'s spot is deterministic');
+});

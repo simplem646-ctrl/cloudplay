@@ -74,7 +74,7 @@ function festivalLoc(npcId, m) {
     at = anchors[hashString(npcId) % anchors.length];
   }
   const from = parseHHMM(f.from || '00:00');
-  return { area, at, hidden: false, anim: 'idle', wander: by ? 1 : 2, from, festival: true, key: `fest|${f.id}|${area}|${at}` };
+  return { area, at, hidden: false, anim: 'idle', wander: by ? 1 : 2, from, festival: true, npc: npcId, key: `fest|${f.id}|${area}|${at}` };
 }
 
 const npcs = {
@@ -126,14 +126,24 @@ const npcs = {
     }
     const home = { x: p.x, z: p.z, facing: p.facing };
     if (jitter && loc.wander > 0) {
-      const rng = a?.rng || mulberry32(hashString(`${loc.key}|${dayNum()}`));
-      for (let k = 0; k < 6; k++) {
-        const r = Math.min(loc.wander, 2.2) * Math.sqrt(rng());
+      // Festival crowds share a few anchors: every guest gets a stable spot of their own (seeded by id, not by day) and steers
+      // clear of whoever already stands there, so nobody overlaps.
+      const fest = !!(loc.festival && loc.npc);
+      const rng = fest ? mulberry32(hashString(`${loc.npc}|${loc.key}`)) : a?.rng || mulberry32(hashString(`${loc.key}|${dayNum()}`));
+      const reach = Math.min(loc.wander, 2.2);
+      const others = fest ? [...ent().actors().values()].filter((o) => o.id !== loc.npc && !o.hidden && !o.leaving) : [];
+      let fallback = null;
+      for (let k = 0; k < (fest ? 16 : 6); k++) {
+        const r = fest ? reach * (0.35 + 0.65 * Math.sqrt(rng())) : reach * Math.sqrt(rng());
         const th = rng() * Math.PI * 2;
         const x = home.x + Math.cos(th) * r;
         const z = home.z + Math.sin(th) * r;
-        if (!area.isBlockedAt(x, z, 0.32) && path.lineClear(area, home.x, home.z, x, z, 0.2)) return { x, z, facing: home.facing, home };
+        if (area.isBlockedAt(x, z, 0.32) || !path.lineClear(area, home.x, home.z, x, z, 0.2)) continue;
+        const pt = { x, z, facing: home.facing, home };
+        if (!others.some((o) => Math.hypot(o.x - x, o.z - z) < 0.8)) return pt;
+        fallback ||= pt;
       }
+      if (fallback) return fallback;
     }
     return { x: home.x, z: home.z, facing: home.facing, home };
   },

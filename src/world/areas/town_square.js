@@ -88,7 +88,7 @@ export default {
     { t: 'lamp_post', x: 12.4, z: 22.4, id: 'lamp_sq_5' },
     { t: 'lamp_post', x: 31.0, z: 22.4, id: 'lamp_sq_6' },
     // greenery
-    { t: 'tree', kind: 'oak', x: 4.6, z: 21.0, scale: 1.2, seed: 5 },
+    { t: 'tree', kind: 'oak', x: 5.6, z: 27.4, scale: 1.1, seed: 5 }, // in the south border band: its canopy must not hide the player on the west walkway
     { t: 'tree', kind: 'cherry', x: 39.6, z: 21.0, scale: 1.1, seed: 6 },
     { t: 'tree', kind: 'cherry', x: 2.8, z: 12.2, scale: 1.0, seed: 8 },
     { t: 'tree', kind: 'oak', x: 41.4, z: 26.2, scale: 1.1, seed: 9 },
@@ -100,7 +100,7 @@ export default {
     { t: 'bush', kind: 'hedge', x: 7.5, z: 9.4, w: 3 },
     { scatter: true, t: 'tree', n: 7, in: { rect: [0, 25.4, 44, 4.6] }, minDist: 4, params: { kinds: ['oak', 'cherry', 'birch'], scaleRange: [0.95, 1.2] } },
     { scatter: true, t: 'tree', n: 5, in: { rect: [0, 0, 44, 6] }, minDist: 4, params: { kinds: ['oak', 'pine', 'birch'], scaleRange: [1.0, 1.3] } },
-    { scatter: true, t: 'tree', n: 3, in: { rect: [0, 6, 2.6, 22] }, minDist: 4, params: { kinds: ['oak', 'pine'], scaleRange: [1.0, 1.2] } },
+    { scatter: true, t: 'tree', n: 2, in: { rect: [0, 6, 2.6, 6] }, minDist: 4, params: { kinds: ['oak', 'pine'], scaleRange: [1.0, 1.2] } },
     { scatter: true, t: 'bush', n: 10, in: { rect: [1, 1, 42, 28] }, minDist: 2.5, params: { kinds: ['round', 'flower'], scaleRange: [0.8, 1.1] } },
   ],
   decor: {

@@ -91,7 +91,7 @@ export const EXTRA_CSS = `
 .lb-rdot.great{background:#f4c542}.lb-rdot.good{background:#6fb85a}.lb-rdot.okay{background:#6fb7e8}.lb-rdot.miss{background:#c9b392}
 .lb-knead-btn{font-size:1.2em;padding:.3em 2em}
 /* touch */
-.lb-touch{position:absolute;inset:0;pointer-events:none;display:none;z-index:6}
+.lb-touch{position:absolute;top:env(safe-area-inset-top,0px);right:env(safe-area-inset-right,0px);bottom:env(safe-area-inset-bottom,0px);left:env(safe-area-inset-left,0px);pointer-events:none;display:none;z-index:6}
 .lb-touch.on{display:block}
 .lb-stick{position:absolute;left:1.2em;bottom:4.4em;width:8em;height:8em;border-radius:50%;background:radial-gradient(circle,rgba(255,244,220,.28),rgba(255,244,220,.12));border:.18em solid rgba(255,244,220,.65);pointer-events:auto;touch-action:none}
 .lb-knob{position:absolute;left:50%;top:50%;width:3.6em;height:3.6em;margin:-1.8em 0 0 -1.8em;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fffaf0,#e8cd98);border:.16em solid #8a5a3a;box-shadow:0 .2em .5em rgba(0,0,0,.3);transition:transform .05s}
@@ -100,6 +100,6 @@ export const EXTRA_CSS = `
 .lb-tbtn.down{transform:scale(.92);background:radial-gradient(circle at 35% 30%,#fff3b8,#f4c542)}
 .lb-tbtn.a{width:5em;height:5em;right:0;bottom:2.2em;font-size:1.5em}
 .lb-tbtn.b{width:4em;height:4em;right:5.6em;bottom:0;font-size:1.3em}
-.lb-tbtn.run{width:3.2em;height:3.2em;right:6.2em;bottom:4.9em;font-size:.9em}
+.lb-tbtn.run{width:3.2em;height:3.2em;right:11.1em;bottom:7.3em;font-size:.9em} /* above-left of B, clear of A */
 .lb-tbtn.menu{position:absolute;right:.8em;top:4.6em;width:2.6em;height:2.6em;font-size:1.2em;line-height:1}
 `;

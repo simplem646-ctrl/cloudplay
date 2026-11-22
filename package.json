@@ -9,7 +9,10 @@
     "build": "node tools/build.mjs",
     "build:dev": "node tools/build.mjs --dev",
     "test": "node --test \"tests/unit/*.test.mjs\" && node tools/check-contract.mjs && node tools/run-validators.mjs",
-    "contract": "node tools/check-contract.mjs"
+    "contract": "node tools/check-contract.mjs",
+    "build:artifact": "node tools/build.mjs --artifact",
+    "check:artifact": "node tools/check-artifact.mjs",
+    "e2e": "node tests/e2e/smoke.cjs"
   },
   "dependencies": {
     "three": "0.187.0"

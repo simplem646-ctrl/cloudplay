@@ -123,7 +123,7 @@ export function questsTab() {
     ...Object.keys(st().done || {}).map((id) => ({ id, done: true })),
   ];
   let sel = 0;
-  let tracked = null;
+  const trackedId = () => st().tracked || null; // single source of truth: Systems toggles state.quests.tracked on ui:trackQuest
   const list = h('div', { class: 'lb-qlist lb-scroll', testid: 'quest-list' });
   const detail = h('div', { class: 'lb-detail lb-qdetail', testid: 'quest-detail' });
   const lanterns = () => (state().story && state().story.lanterns) || 0;
@@ -147,7 +147,7 @@ export function questsTab() {
       const def = defs[e.id] || {};
       list.appendChild(h('div', { class: 'lb-qrow' + (e.done ? ' done' : '') + (i === sel ? ' is-sel' : ''), onClick: () => setSel(i), onPointerenter: () => { if (sel !== i) setSel(i); } },
         def.kind === 'main' ? h('span', { class: 'lb-mini', html: LANTERN_SVG }) : h('span', { class: 'lb-dotq' }, e.done ? '✓' : '•'),
-        h('span', { class: 'lb-qname' }, def.title || e.id), tracked === e.id ? h('span', { class: 'lb-tracked' }, 'tracked') : null));
+        h('span', { class: 'lb-qname' }, def.title || e.id), trackedId() === e.id ? h('span', { class: 'lb-tracked' }, 'tracked') : null));
     });
   }
   function paintDetail() {
@@ -168,14 +168,14 @@ export function questsTab() {
       h('p', { class: 'lb-detail-desc' }, def.desc || ''),
       stage ? h('div', { class: 'lb-stage' }, h('b', null, 'Now: '), stage.text) : null,
       bits.length ? h('div', { class: 'lb-detail-meta' }, h('span', null, 'Reward: ', h('b', null, bits.join(', ')))) : null,
-      !e.done ? h('button', { class: 'lb-btn primary', testid: 'quest-track', onClick: track }, tracked === e.id ? 'Tracked' : 'Track') : null,
+      !e.done ? h('button', { class: 'lb-btn primary', testid: 'quest-track', onClick: track }, trackedId() === e.id ? 'Tracked' : 'Track') : null,
     );
   }
   function track() {
     const e = entries()[sel];
     if (!e || e.done) { sfx('ui_error'); return; }
-    tracked = e.id; sfx('ui_confirm');
-    Game.bus.emit(EVT.UI_TRACK_QUEST, { id: e.id });
+    sfx('ui_confirm');
+    if (trackedId() !== e.id) Game.bus.emit(EVT.UI_TRACK_QUEST, { id: e.id }); // Systems toggles; only ask when it is not tracked yet
     paintList(); paintDetail();
   }
   function setSel(i) { sel = Math.max(0, Math.min(Math.max(0, entries().length - 1), i)); paintList(); paintDetail(); const s = list.querySelector('.is-sel'); if (s) s.scrollIntoView({ block: 'nearest' }); }
